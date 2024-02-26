@@ -1,10 +1,13 @@
 #include<iostream>
 #include<vector>
+#include <string>
+
+using namespace std;
 
 class Solution {
 public:
     // 704. 二分查找，闭区间
-    int search_closed(std::vector<int>& nums, int target) {
+    int search_closed(vector<int>& nums, int target) {
         int i = 0, j = nums.size()-1;
         int mid=0;
         while (i<=j)
@@ -24,7 +27,7 @@ public:
     }
 
     // 704. 二分查找，闭区间
-    int search_open(std::vector<int>& nums, int target){
+    int search_open(vector<int>& nums, int target){
         int left = 0, right = nums.size();
         int mid;
         while(left<right){
@@ -40,7 +43,7 @@ public:
     }
 
     // 27. 移除元素
-    int removeElement(std::vector<int>& nums, int val) {
+    int removeElement(vector<int>& nums, int val) {
         if(nums.size() == 0) return 0;
         int i = 0, j = 0;
         while ( j < nums.size()){
@@ -52,7 +55,7 @@ public:
         }
         return i;
     }
-    int removeElement1(std::vector<int>& nums, int val) {
+    int removeElement1(vector<int>& nums, int val) {
         if(nums.size() == 0) return 0;
         int i = 0;
         for(int j = 0; j < nums.size(); j++){
@@ -65,7 +68,7 @@ public:
     }
 
     // 26 删除有序数组中的重复项
-    int removeDuplicates(std::vector<int>& nums) {
+    int removeDuplicates(vector<int>& nums) {
         int i = 0;
         for(int j = 1; j < nums.size(); j++){
             if(nums[i] != nums[j]){
@@ -77,7 +80,7 @@ public:
     }
 
     // 283.移动零
-    void moveZeroes(std::vector<int>& nums) {
+    void moveZeroes(vector<int>& nums) {
         int i = 0;
         for(int j = 0; j<nums.size(); j++){
             if(nums[j]){
@@ -89,13 +92,59 @@ public:
             }
         }
     }   
+
+    // 844. 比较含退格的字符串
+    // 方法一： 使用栈
+    string build(string str){
+        string ret;
+        for(char ch : str){
+            if(ch != '#'){
+                ret.push_back(ch);
+            }
+            else if (!ret.empty()){
+                ret.pop_back();
+            }
+        }
+        return ret;
+    }
+    bool backspaceCompare1(string s, string t) {
+        return build(s) == build(t);
+    }
+
+    // 方法二：双指针
+    // 注意cpp不像python一样使用缩进来标明代码块！！！最好加上大括号。
+    bool backspaceCompare2(string s, string t) {
+        int ls = s.size()-1, lt = t.size()-1;
+        int skips = 0, skipt =0;
+        while(ls >= 0 || lt >=0){
+            while(ls >= 0){
+                if (s[ls] == '#')
+                    skips++,ls--;
+                else if(skips > 0)
+                    skips--,ls--;
+                else break;
+            }
+            while(lt >= 0){
+                if (t[lt] == '#')
+                    skipt++,lt--;
+                else if(skipt > 0)
+                    skipt--,lt--;
+                else break;
+            }
+            if(ls >= 0 && lt>=0){
+                if(s[ls] != t[lt]) return false;
+            }
+            else{
+                if(ls >= 0 || lt >=0) return false;
+            }
+            ls--,lt--;
+        }
+        return true;
+    }
 };
     
 
 int main(){
     Solution a = Solution();
-    std::vector<int> nums = {1,2,3,4,5,6,7,8,9,10};
-    int target = 100;
-    std::cout << a.search_open(nums, target) << std::endl;
-    return 0;
+    a.backspaceCompare2("ab#c","ad#c");
 }
