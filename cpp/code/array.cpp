@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include <string>
+#include<cmath>
 
 using namespace std;
 
@@ -141,10 +142,93 @@ public:
         }
         return true;
     }
+
+    // 977. 有序数组的平方
+    vector<int> sortedSquares(vector<int>& nums) {
+        vector<int> res(nums.size());
+        int i = 0, j = nums.size()-1;
+        for(int pos = j; pos >= 0; pos--){
+            if(abs(nums[i])>abs(nums[j])){
+                res[pos] = pow(nums[i],2);
+                i++;
+            }
+            else{
+                res[pos] = pow(nums[j],2);
+                j--;
+            }
+        }
+        return res;
+    }
+
+    // 209 长度最小的子数组
+    // 双指针
+    int minSubArrayLen(int target, vector<int>& nums) {
+        int windowsum = 0;
+        int i = 0;
+        int res = INT_MAX;
+        int winlength = 0;
+        for(int j = 0; j < nums.size(); j++){
+            windowsum += nums[j];
+            winlength++;
+            while(windowsum >= target){
+                res = res > winlength? winlength:res;
+                windowsum -= nums[i++];
+                winlength--;
+            }
+        }
+        return res == INT_MAX? 0 : res;
+    }
+
+    // 59.螺旋矩阵Ⅱ
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int>> res(n, vector<int>(n, 0));
+        int i = 1;
+        int left = 0, up = 0;
+        int right = n - 1, down = n-1;
+        int direction = 0;
+        while( i <= pow(n, 2)){
+            switch (direction%4)
+            {
+            case 0:
+                for(int j = left; j <= right; j ++){
+                    res[up][j] = i++;
+                }
+                up++;
+                break;
+            case 1:
+                for(int j = up; j <= down; j++){
+                    res[j][right] = i++;
+                }
+                right--;
+                break;
+            case 2:
+                for(int j = right; j >= left; j--){
+                    res[down][j] = i++;
+                }
+                down--;
+                break;
+            case 3:
+                for(int j = down; j >= up; j--){
+                    res[j][left] = i++;
+                }
+                left++;
+                break;
+            }
+            direction++;
+        }
+        return res;
+    }
 };
     
 
 int main(){
     Solution a = Solution();
-    a.backspaceCompare2("ab#c","ad#c");
+    vector<vector<int>> out = a.generateMatrix(4);
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+            cout << out[i][j] << ' ';
+        }
+        cout  << endl;
+    }
+
 }
