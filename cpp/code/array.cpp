@@ -1,10 +1,12 @@
 #include<iostream>
 #include<vector>
 
+using namespace std;
+
 class Solution {
 public:
     // 704. 二分查找，闭区间
-    int search_closed(std::vector<int>& nums, int target) {
+    int search_closed(vector<int>& nums, int target) {
         int i = 0, j = nums.size()-1;
         int mid=0;
         while (i<=j)
@@ -24,7 +26,7 @@ public:
     }
 
     // 704. 二分查找，闭区间
-    int search_open(std::vector<int>& nums, int target){
+    int search_open(vector<int>& nums, int target){
         int left = 0, right = nums.size();
         int mid;
         while(left<right){
@@ -40,7 +42,7 @@ public:
     }
 
     // 27. 移除元素
-    int removeElement(std::vector<int>& nums, int val) {
+    int removeElement(vector<int>& nums, int val) {
         if(nums.size() == 0) return 0;
         int i = 0, j = 0;
         while ( j < nums.size()){
@@ -52,7 +54,7 @@ public:
         }
         return i;
     }
-    int removeElement1(std::vector<int>& nums, int val) {
+    int removeElement1(vector<int>& nums, int val) {
         if(nums.size() == 0) return 0;
         int i = 0;
         for(int j = 0; j < nums.size(); j++){
