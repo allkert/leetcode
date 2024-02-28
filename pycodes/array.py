@@ -322,6 +322,8 @@ class SlideWindow():
                 needCnt+=1
                 i+=1
         return '' if res[1]>len(s) else s[res[0]:res[1]+1]
+    
+    
 class SimulateBehavior():
     def _59_1(self,n):
         # 我的思路是根据方向进行判断，如果下一个位置已经被填充，则改变方向，或者超出矩阵范围改变方向
