@@ -248,25 +248,6 @@ public:
         }
         return NULL;
     }
-    // 242. 有效的字母异位词
-    bool isAnagram(string s, string t) {
-        int table[26];
-        for(char ch:s){
-            table[ch - 'a']++;
-        }
-        for(char ch:s){
-            table[ch - 'a']--;
-        }
-        for(int times: table){
-            if(times) return false;
-        }
-        return true;
-    }
-
-    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-        
-    }
-
 };
 
 
