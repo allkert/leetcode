@@ -156,6 +156,8 @@ public:
     }
 
     // 18 四数之和
+    /* 我的想法，两层for循环加上哈希表解两数之和，但是在测试例子
+    [1000000000,1000000000,1000000000,1000000000], target=0时会溢出 */
     vector<vector<int>> fourSum(vector<int>& nums, int target) {
         vector<vector<int>> res;
         sort(nums.begin(), nums.end());
@@ -182,6 +184,40 @@ public:
             }
         }
         return res;
+    }
+
+    // ref
+    vector<vector<int>> fourSum_ref(vector<int>& nums, int target){
+        vector<vector<int>> result;
+        sort(nums.begin(), nums.end());
+        for(int k = 0; k < nums.size(); k++){
+            if(nums[k] >= 0 && nums[k] > target) break;
+            if(k > 0 && nums[k] == nums[k-1]) continue;
+            for(int i = k + 1; i < nums.size(); i++){
+                if(nums[k]+nums[i] > target && nums[k] + nums[i] >= 0) break;
+                if(i != k + 1 && nums[i] == nums[i-1]) continue;
+                int left = i + 1;
+                int right = nums.size()-1;
+                while(left < right){
+                    if((long long)nums[k]+nums[i]+nums[left]+nums[right] > target){
+                        right--;
+                    }
+                    else if ((long long)nums[k]+nums[i]+nums[left]+nums[right] < target){
+                        left++;
+                    }
+                    else{
+                        cout<<"ASDASD";
+                        result.push_back({nums[k], nums[i], nums[left], nums[right]});
+                        while (right > left && nums[right] == nums[right - 1]) right--;
+                        while (right > left && nums[left] == nums[left + 1]) left++;
+                        right--;
+                        left++;
+                    }
+                    
+                }
+            }
+        }
+        return result;
     }
 
 };
