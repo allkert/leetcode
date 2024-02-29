@@ -199,10 +199,10 @@ public:
                 int left = i + 1;
                 int right = nums.size()-1;
                 while(left < right){
-                    if((long long)nums[k]+nums[i]+nums[left]+nums[right] > target){
+                    if((long)nums[k]+nums[i]+nums[left]+nums[right] > target){
                         right--;
                     }
-                    else if ((long long)nums[k]+nums[i]+nums[left]+nums[right] < target){
+                    else if ((long)nums[k]+nums[i]+nums[left]+nums[right] < target){
                         left++;
                     }
                     else{
@@ -223,18 +223,21 @@ public:
 };
 
 int main(){
-    Solution s;
-    vector<int> a({1000000000,1000000000,1000000000,1000000000});
-    vector<vector<int>> res = s.fourSum(a,0);
-    for(vector<vector<int>>::iterator it1 = res.begin(); it1 < res.end(); it1++){
-        cout <<"[";
-        for(vector<int>:: iterator it2 = (*it1).begin(); it2 < (*it1).end(); it2++){
-            cout << *it2 << '\t';
-        }
-        cout <<']'<<endl;
-    }
-    cout << '1' <<endl;
+    // Solution s;
+    // vector<int> a({1000000000,1000000000,1000000000,1000000000});
+    // vector<vector<int>> res = s.fourSum(a,0);
+    // for(vector<vector<int>>::iterator it1 = res.begin(); it1 < res.end(); it1++){
+    //     cout <<"[";
+    //     for(vector<int>:: iterator it2 = (*it1).begin(); it2 < (*it1).end(); it2++){
+    //         cout << *it2 << '\t';
+    //     }
+    //     cout <<']'<<endl;
+    // }
+    // cout << '1' <<endl;
     // for(vector<int>::iterator it = a.begin(); it < a.end(); it++){
     //     cout<<*it<<'\t';
     // }
+    int a = 3000000000;
+    int b = 2147483648;
+    cout << typeid(b).name();
 }
