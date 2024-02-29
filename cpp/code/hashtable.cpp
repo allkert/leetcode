@@ -154,4 +154,51 @@ public:
         }
         return res;
     }
+
+    // 18 四数之和
+    vector<vector<int>> fourSum(vector<int>& nums, int target) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        for(int i = 0; i < n - 3; i++){
+            if(i > 0 && nums[i] == nums[i-1]) continue;
+            for(int j = i + 1; j < n - 2; j++){
+                if(j != i + 1 && nums[j]==nums[j-1]) continue;
+                unordered_set<int> tmp;
+                int newtarget = target - nums[i] - nums[j];
+                for(int k = j + 1; k < n; k++){
+                    auto a = tmp.find(newtarget-nums[k]);
+                    if(a != tmp.end()){
+                        res.push_back({nums[i], nums[j], nums[k], *a});
+                        while(k < n - 1){
+                            if(nums[k] != nums[k+1]){
+                                break;
+                            }
+                            k++;
+                        }
+                    }
+                    tmp.insert(nums[k]);
+                }
+            }
+        }
+        return res;
+    }
+
 };
+
+int main(){
+    Solution s;
+    vector<int> a({1000000000,1000000000,1000000000,1000000000});
+    vector<vector<int>> res = s.fourSum(a,0);
+    for(vector<vector<int>>::iterator it1 = res.begin(); it1 < res.end(); it1++){
+        cout <<"[";
+        for(vector<int>:: iterator it2 = (*it1).begin(); it2 < (*it1).end(); it2++){
+            cout << *it2 << '\t';
+        }
+        cout <<']'<<endl;
+    }
+    cout << '1' <<endl;
+    // for(vector<int>::iterator it = a.begin(); it < a.end(); it++){
+    //     cout<<*it<<'\t';
+    // }
+}
