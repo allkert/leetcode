@@ -1,18 +1,33 @@
 #include<vector>
 #include<iostream>
+#include<unordered_set>
 
 using namespace std;
 
-int main() {
-    std::vector<int> v;
-    v.push_back(1);
-    v.push_back(2);
-    v.push_back(3);
-    v.push_back(4);
-    for (vector<int>::iterator it = v.begin(); it != v.end(); it++)
-    {
-        cout << *it << endl;
-        /* code */
+int lengthOfLongestSubstring(string s) {
+    if(s.length()==0) return 0;
+    unordered_set<char> uset;
+    int res = 0;
+    int left = 0, right = 0;
+    while(right < s.length()){
+        unordered_set<char>:: iterator it = uset.find(s[right]);
+        if(it != uset.end()){
+            while(s[left] != s[right]){
+                uset.erase(s[left]);
+                left++;
+            }
+            left++;
+        }
+        else{
+            res = res < right - left + 1? right-left+1:res;
+            uset.insert(s[right]);
+        }
+        right++;
     }
-    
+    return  res;
+}
+
+int main() {
+    cout << lengthOfLongestSubstring("abcabcbb");
+
 }
