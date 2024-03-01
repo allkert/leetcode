@@ -237,7 +237,9 @@ int main(){
     // for(vector<int>::iterator it = a.begin(); it < a.end(); it++){
     //     cout<<*it<<'\t';
     // }
-    int a = 3000000000;
-    int b = 2147483648;
-    cout << typeid(b).name();
+    int a = 0;
+    int b = 1000000000;
+    int c = 2000000000;
+    a = b + c;
+    cout << a ;
 }
