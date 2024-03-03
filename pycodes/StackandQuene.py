@@ -141,10 +141,11 @@ class Solution(object):
         map_, pri_que = Counter(nums), []
         for (key, freq) in map_.items():
             heapq.heappush(pri_que,(freq,key))
+            print(pri_que)
             if len(pri_que)>k:heapq.heappop(pri_que)
         return [heapq.heappop(pri_que)[1] for _ in range(k)]
     
 
     
 a = Solution()
-print(a.topKFrequent(nums=[1,1,1,7,7,3],k=2))
+print(a.topKFrequent_1(nums=[1,1,1,7,7,3],k=2))
