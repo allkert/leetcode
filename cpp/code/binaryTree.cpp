@@ -32,9 +32,22 @@ public:
 
     // 迭代
     vector<int> preorderTraversal(TreeNode *root){
+        if(!root) return {};
         vector<int> res;
         stack<TreeNode> st;
-        
+        st.push(*root);
+        while(!st.empty()){
+            TreeNode node = st.top();
+            res.push_back(node.val);
+            st.pop();
+            if(node.right != NULL){
+                st.push(*node.right);
+            }
+            if(node.left != NULL){
+                st.push(*node.left);
+            }
+        }
+        return res;
     }
 
     // 94.二叉树的中序遍历
@@ -65,9 +78,110 @@ public:
         postTraversal(root, res);
         return res;
     }
+
+    // 迭代
+    vector<int> postorderTraversal(TreeNode *root){
+        if(root == NULL) return {};
+        vector<int> res;
+        stack<TreeNode*> st;
+        TreeNode *cur = root;
+        while(!st.empty() or cur != NULL){
+            if(cur == NULL){
+                cur = st.top();
+                res.push_back(cur->val);
+                st.pop();
+                cur = cur->right;
+            }
+            else{
+                st.push(cur);
+                cur = cur->left;
+            }
+            
+        }
+        return res;
+    }
+
+    // 迭代
+    // 先中右左遍历，然后反过来
+    vector<int> postorderTraversal(TreeNode *root){
+        if(root == NULL) return {};
+        vector<int> res;
+        stack<TreeNode> st;
+        st.push(*root);
+        while (!st.empty()){
+            TreeNode node = st.top();
+            st.pop();
+            res.push_back(node.val);
+            if(node.left){
+                st.push(*node.left);
+            }
+            if(node.right){
+                st.push(*node.right);
+            }
+        }
+        reverse(res.begin(), res.end());
+        return res;
+        
+    }
+
+    // 前中后序遍历的统一写法
+    // 以中序遍历为例
+    vector<int> generalTrversal(TreeNode *root){
+        vector<int> res;
+        stack<TreeNode*> st;
+        if(root == NULL) return {};
+        st.push(root);
+        while(!st.empty()){
+            TreeNode* nodeptr = st.top();
+            st.pop();
+            if(nodeptr != NULL){
+                if(nodeptr->right){
+                    st.push(nodeptr->right);
+                }
+                st.push(nodeptr);
+                st.push(NULL);
+                if(nodeptr->left){
+                    st.push(nodeptr->left);
+                }
+            }
+            else{
+                nodeptr = st.top();
+                st.pop();
+                res.push_back(nodeptr->val);
+            }
+        }
+        return res;
+    }
+
+
+    // 102 二叉树的层序遍历
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        queue<TreeNode> layer;
+        vector<vector<int>> res;
+        if(root == NULL) return res;
+        layer.push(*root);
+        while(!layer.empty()){
+            vector<int> layerval;
+            int size = layer.size();
+            for(int i = 0; i < size; i++){
+                TreeNode node = layer.front();
+                layer.pop();
+                layerval.push_back(node.val);
+                if(node.left){
+                    layer.push(*node.left);
+                }
+                if(node.right){
+                    layer.push(*node.right);
+                }
+            }
+            res.push_back(layerval);
+        }
+        return res;
+    }
+
+
 };
 
 int main(){
     vector<int> a = {1,2,3};
-    stack<int, list<int>> b{1,2,3,4};
 }
