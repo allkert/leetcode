@@ -155,6 +155,7 @@ public:
 
 
     // 102 二叉树的层序遍历
+    // 迭代法
     vector<vector<int>> levelOrder(TreeNode* root) {
         queue<TreeNode> layer;
         vector<vector<int>> res;
@@ -179,7 +180,119 @@ public:
         return res;
     }
 
+    // 递归法
+    vector<vector<int>> levelOrder_recursion(TreeNode *root){
+        vector<vector<int>> res;
+        order(root, res, 0);
+        return res;
+    }
+    void order(TreeNode *nodeptr, vector<vector<int>>& res, int depth){
+        if(nodeptr == NULL) return;
+        // 为当前depth开辟一个vector<int>空间
+        if(res.size() == depth) res.push_back(vector<int>());
+        res[depth].push_back(nodeptr->val);
+        // 这里必须先左后右
+        order(nodeptr->left, res, depth+1);
+        order(nodeptr->right, res, depth+1);
+    }
 
+    // 107 二叉树的层序遍历2
+    void levelOrder_reverse_recursion(vector<vector<int>>& res, TreeNode *curptr, int depth){
+        if(curptr == NULL) return;
+        if(res.size() == depth) res.push_back(vector<int>());
+        res[depth].push_back(curptr->val);
+        levelOrder_reverse_recursion(res, curptr->left, depth+1);
+        levelOrder_reverse_recursion(res, curptr->right, depth+1);
+    }
+
+    vector<vector<int>> levelOrder_reverse(TreeNode *root){
+        vector<vector<int>> res;
+        levelOrder_reverse_recursion(res, root, 0);
+        reverse(res.begin(), res.end());
+        return res;
+    }
+
+    // 199. 二叉树的右视图
+    void rightSideView_recursion(TreeNode *nodeptr, vector<int>& res, int depth){
+        if(nodeptr == NULL) return;
+        if(res.size() == depth){
+            res.push_back(nodeptr->val);
+        }
+        else{
+            res[depth] = nodeptr->val;
+        }
+        rightSideView_recursion(nodeptr->left, res, depth+1);
+        rightSideView_recursion(nodeptr->right, res, depth+1);
+    }
+
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> res;
+        rightSideView_recursion(root, res, 0);
+        return res;
+    }
+
+    // 637. 二叉树的层平均值
+    vector<double> averageOfLevels(TreeNode* root) {
+        vector<double> res;
+        queue<TreeNode>  queue;
+        if(root == NULL) return {};
+        queue.push(*root);
+        while(!queue.empty()){
+            double sum = 0;
+            int nodenum = 0;
+            int layersize = queue.size();
+            for(;nodenum < layersize; nodenum++){
+                TreeNode tmp = queue.front();
+                queue.pop();
+                sum += tmp.val;
+                if(tmp.left) queue.push(*tmp.left);
+                if(tmp.right) queue.push(*tmp.right);
+            }
+            res.push_back(sum/nodenum);
+        }
+    return res;
+    }
+
+
+    // 429. N叉树的层序遍历
+    // 迭代
+    vector<vector<int>> levelOrder_Ntrees(Node* root) {
+        vector<vector<int>> res;
+        queue<Node> queue;
+        if(root != NULL) queue.push(*root);
+        while(!queue.empty()){
+            int nodenum = queue.size();
+            vector<int> layer_traversal;
+            for(int i = 0; i < nodenum; i++){
+                Node node = queue.front();
+                queue.pop();
+                layer_traversal.push_back(node.val);
+                for(Node* n : node.children){
+                    queue.push(*n);
+                }
+            }
+            res.push_back(layer_traversal);
+        }
+        return res;
+    }
+
+};
+
+class Node {
+public:
+    int val;
+    vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
 };
 
 int main(){
