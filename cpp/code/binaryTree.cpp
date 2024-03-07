@@ -84,35 +84,20 @@ public:
 
     // 94.二叉树的中序遍历
     // 递归
-    void inorderTraversal(TreeNode *Node, vector<int>& res){
+    void inorderT(TreeNode *Node, vector<int>& res){
         if(Node == NULL) return;
-        inorderTraversal(Node->left, res);
+        inorderT(Node->left, res);
         res.push_back(Node->val);
-        inorderTraversal(Node->right, res);
+        inorderT(Node->right, res);
     }
-    vector<int> inorderTraversal(TreeNode* root) {
+    vector<int> inorderTraversal_recursion(TreeNode* root) {
         vector<int> res;
-        inorderTraversal(root, res);
-        return res;
-    }
-
-    // 145.二叉树的后序遍历
-    // 递归
-    void postTraversal(TreeNode* cur, vector<int>& res){
-        if(!cur) return;
-        postTraversal(cur->left, res);
-        postTraversal(cur->right, res);
-        res.push_back(cur->val);
-    }
-
-    vector<int> postorderTraversal_recursion(TreeNode *root){
-        vector<int> res;
-        postTraversal(root, res);
+        inorderT(root, res);
         return res;
     }
 
     // 迭代
-    vector<int> postorderTraversal(TreeNode *root){
+    vector<int> inorderTraversal_it(TreeNode *root){
         if(root == NULL) return {};
         vector<int> res;
         stack<TreeNode*> st;
@@ -132,6 +117,22 @@ public:
         }
         return res;
     }
+
+    // 145.二叉树的后序遍历
+    // 递归
+    void postTraversal(TreeNode* cur, vector<int>& res){
+        if(!cur) return;
+        postTraversal(cur->left, res);
+        postTraversal(cur->right, res);
+        res.push_back(cur->val);
+    }
+
+    vector<int> postorderTraversal_recursion(TreeNode *root){
+        vector<int> res;
+        postTraversal(root, res);
+        return res;
+    }
+
 
     // 迭代
     // 先中右左遍历，然后反过来
@@ -368,6 +369,7 @@ public:
 
 
     // 116. 填充每个节点的下一个右侧节点指针
+    // 117. 填充每个节点的下一个右侧节点指针 II
     Node* connect(Node* root) {
         if(root == nullptr) return root;
         queue<Node*> queue;
@@ -387,8 +389,115 @@ public:
         return root;
     }
 
+
+    // 117. 填充每个节点的next指针，指向下一个右节点。
+    Node* connect2(Node* root) {
+        if(root == nullptr) return root;
+        queue<Node*> queue;
+        queue.push(root);
+        while(!queue.empty()){
+            int size = queue.size();
+            stack<Node*> st;
+            for(int i = 0; i < size; i++){
+                Node* ptr = queue.front();
+                queue.pop();
+                if(ptr == nullptr){
+                    ptr = queue.front();
+                    queue.pop();
+                    i++;
+                    while(!st.empty()){
+                        st.top()->next = ptr;
+                        st.pop();
+                    }
+                }
+                st.push(ptr);
+                if(ptr->left) queue.push(ptr->left);
+                if(ptr->right){
+                    queue.push(nullptr);
+                    queue.push(ptr->right);
+                }
+            }
+        }
+        return root;
+    }
+
+
+    // 104 二叉树的最大深度
+    // 递归
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1+ max(maxDepth(root->left), maxDepth(root->right));    
+    }
+
+    // 不行我要用迭代，递归太简单了
+    // nonono，迭代也很简单，层序遍历，不愧是简单题，真不行啊
+
+    
+    // 111. 二叉树的最小深度
+    // 递归
+    int minDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        int leftMinDepth = minDepth(root->left);
+        int rightMinDepth = minDepth(root->right);
+        if(leftMinDepth == 0 && rightMinDepth == 0){
+            return 1;
+        }
+        else{
+            if(leftMinDepth == 0){
+                return 1 + rightMinDepth;
+            }
+            else if(rightMinDepth == 0){
+                return 1 + leftMinDepth;
+            }
+            else{
+                return 1 + min(leftMinDepth, rightMinDepth);
+            }
+        }
+    }
+
+    // 迭代
+    int minDepth_it(TreeNode* root){
+        if(root == NULL) return 0;
+        queue<TreeNode*> queue;
+        queue.push(root);
+        int depth = 1;
+        for( ; !queue.empty(); depth++){
+            int len = queue.size();
+            for(int i = 0; i < len; i++){
+                TreeNode* tmp = queue.front();
+                queue.pop();
+                if(tmp->left == NULL and tmp->right == NULL){
+                    return depth;
+                }
+                if(tmp->left){
+                    queue.push(tmp->left);
+                }
+                if(tmp->right){
+                    queue.push(tmp->right);
+                }
+            }
+        }
+        return depth;
+        
+    }
+
+    // 226  翻转二叉树
+    void invertT_recursion(TreeNode *root){
+        if(root == NULL) return;
+        swap(root->left, root->right);
+        invertT_recursion(root->left);
+        invertT_recursion(root->right);
+    }
+    TreeNode* invertTree(TreeNode* root) {
+        invertT_recursion(root);
+        return root;
+    }
+
 };
 
 int main(){
-    vector<int> a = {1,2,3};
+    for(int i = 0; i < 5; i++){
+        i++;
+        cout<<"this is a loop" <<endl;
+    }
 }
