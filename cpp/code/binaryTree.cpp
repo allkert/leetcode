@@ -9,6 +9,38 @@
 
 using namespace std;
 
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+        : val(_val), left(_left), right(_right), next(_next) {}
+};
+
+class NtreeNode {
+public:
+    int val;
+    vector<NtreeNode*> children;
+
+    NtreeNode() {}
+
+    NtreeNode(int _val) {
+        val = _val;
+    }
+
+    NtreeNode(int _val, vector<NtreeNode*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+
 struct TreeNode{
     int val;
     TreeNode* left, *right;
@@ -256,18 +288,18 @@ public:
 
     // 429. N叉树的层序遍历
     // 迭代
-    vector<vector<int>> levelOrder_Ntrees(Node* root) {
+    vector<vector<int>> levelOrder_Ntrees(NtreeNode* root) {
         vector<vector<int>> res;
-        queue<Node> queue;
+        queue<NtreeNode> queue;
         if(root != NULL) queue.push(*root);
         while(!queue.empty()){
             int nodenum = queue.size();
             vector<int> layer_traversal;
             for(int i = 0; i < nodenum; i++){
-                Node node = queue.front();
+                NtreeNode node = queue.front();
                 queue.pop();
                 layer_traversal.push_back(node.val);
-                for(Node* n : node.children){
+                for(NtreeNode* n : node.children){
                     queue.push(*n);
                 }
             }
@@ -276,23 +308,85 @@ public:
         return res;
     }
 
-};
-
-class Node {
-public:
-    int val;
-    vector<Node*> children;
-
-    Node() {}
-
-    Node(int _val) {
-        val = _val;
+    // 递归
+    void Ntrees_recursion(vector<vector<int>>& res, int depth, NtreeNode* root){
+        if(root == NULL) return;
+        if(res.size() == depth){
+            res.push_back(vector<int>());
+        }
+        res[depth].push_back(root->val);
+        for(NtreeNode* child: root->children){
+            Ntrees_recursion(res, depth+1, child);
+        }
+    }
+    vector<vector<int>> levelOrder_Ntrees_recursion(NtreeNode* root){
+        vector<vector<int>> res;
+        Ntrees_recursion(res, 0, root);
+        return res;
     }
 
-    Node(int _val, vector<Node*> _children) {
-        val = _val;
-        children = _children;
+
+    // 515 在每个树行中找最大值
+    // 迭代
+    vector<int> largestValues(TreeNode* root) {
+        vector<int> res;
+        queue<TreeNode> queue;
+        if(root != NULL) queue.push(*root);
+        while(!queue.empty()){
+            int nodenum = queue.size();
+            int max_ = INT_MIN;
+            for(int i = 0; i < nodenum; i++){
+                TreeNode tmp = queue.front();
+                queue.pop();
+                max_ = max_ > tmp.val? max_:tmp.val;
+                if(tmp.left) queue.push(*tmp.left);
+                if(tmp.right) queue.push(*tmp.right);
+            }
+            res.push_back(max_);
+        }
+        return res;
     }
+
+    // 递归
+    vector<int> largestValues_recursion(TreeNode* root){
+        vector<int> res;
+        largestV_recursion(res, 0, root);
+        return res;
+    }
+
+    void largestV_recursion(vector<int>& res, int depth, TreeNode *root){
+        if (root == NULL) return;
+        if(res.size() == depth){
+            res.push_back(root->val);
+        }
+        else{
+            res[depth] = res[depth] > root->val? res[depth]:root->val;
+        }
+        largestV_recursion(res, depth+1, root->left);
+        largestV_recursion(res, depth+1, root->right);
+    }
+
+
+    // 116. 填充每个节点的下一个右侧节点指针
+    Node* connect(Node* root) {
+        if(root == nullptr) return root;
+        queue<Node*> queue;
+        queue.push(root);
+        while(!queue.empty()){
+            int size = queue.size();
+            for(int i = 0; i < size; i++){
+                Node *tmp = queue.front();
+                queue.pop();
+                if(tmp->left) queue.push(tmp->left);
+                if(tmp->right) queue.push(tmp->right);
+                if(i != size - 1){
+                    tmp->next = queue.front();
+                }
+            }
+        }
+        return root;
+    }
+
 };
 
 int main(){
