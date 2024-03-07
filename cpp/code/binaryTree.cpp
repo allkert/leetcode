@@ -595,9 +595,29 @@ public:
         return root != NULL;
     }
 
-    // 110.平衡二叉树
+    // 110.判断平衡二叉树
+    // 判断是否为平衡二叉树，如果是返回高度，否则返回-1
+    // 递归
+    int getHeight(TreeNode *node){
+        if(node == NULL){
+            return 0;
+        }
+        int leftHeight = getHeight(node->left);
+        if(leftHeight == -1) return -1;
+        int rightHeight = getHeight(node->right);
+        if(rightHeight == -1) return -1;
+        return abs(leftHeight - rightHeight) > 1 ? -1 : 1 + max(leftHeight, rightHeight);
+    }
+
+
     bool isBalanced(TreeNode* root) {
-        
+        int res = getHeight(root);
+        return res == -1? false:true;
+    }
+
+    // 257.二叉树的所有路径
+    vector<string> binaryTreePaths(TreeNode* root) {
+
     }
 
 

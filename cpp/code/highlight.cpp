@@ -1,6 +1,9 @@
 # include<iostream>
+# include<limits>
+# include<algorithm>
+# include<math.h>
 
-
+using namespace std;
 
 /* 
     用于记录没学会的题复习
@@ -79,5 +82,26 @@ public:
             bits = bits >> 1;
         }
         return root != NULL;
+    }
+
+
+    // 110.判断平衡二叉树
+    // 判断是否为平衡二叉树，如果是返回高度，否则返回-1
+    // 递归
+    int getHeight(TreeNode *node){
+        if(node == NULL){
+            return 0;
+        }
+        int leftHeight = getHeight(node->left);
+        if(leftHeight == -1) return -1;
+        int rightHeight = getHeight(node->right);
+        if(rightHeight == -1) return -1;
+        return abs(leftHeight - rightHeight) > 1 ? -1 : 1 + max(leftHeight, rightHeight);
+    }
+
+
+    bool isBalanced(TreeNode* root) {
+        int res = getHeight(root);
+        return res == -1? false:true;
     }
 };
