@@ -712,7 +712,63 @@ public:
         }
         return result;
     }
-    
+
+
+    // 513找树左下角的值
+    // 迭代
+    int findBottomLeftValue_it(TreeNode* root) {
+        queue<TreeNode*> q;
+        q.push(root);
+        int res;
+        while(!q.empty()){
+            int size = q.size();
+            res = q.front()->val;
+            for(int i = 0; i < size; i++){
+                TreeNode* node = q.front();
+                q.pop();
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+            }
+        }
+        return res;
+    }
+
+    // 递归
+    int findBottomLeftValue(TreeNode* root) {
+        int resdepth = -1;
+        int res;
+        findBottomLeftV_recursion(root, 0, res, resdepth);
+        return res;
+    }
+
+    void findBottomLeftV_recursion(TreeNode* root, int curdepth, int& res, int& resdepth){
+        if(root->left == NULL and root->right == NULL){
+            if(curdepth > resdepth){
+                resdepth = curdepth;
+                res = root->val;
+            }
+            return;
+        }
+        if(root->left) findBottomLeftV_recursion(root->left, curdepth+1, res, resdepth);
+        if(root->right) findBottomLeftV_recursion(root->right, curdepth+1, res, resdepth);
+    }
+
+
+    // 112.路径总和
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        if(root == NULL) return false;
+        if(root->left == NULL && root->right == NULL){
+            if(root->val == targetSum) return true;
+            return false;
+        }
+        return hasPathSum(root->left, targetSum-root->val) || hasPathSum(root->right, targetSum-root->val);
+    }
+
+    // 106. 从中序与后序遍历序列构造二叉树
+    TreeNode* buildTree1(vector<int>& inorder, vector<int>& postorder) {
+        int i = 0;
+        
+    }
 
 };
 

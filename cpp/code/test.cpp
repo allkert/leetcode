@@ -1,6 +1,7 @@
 #include<vector>
 #include<iostream>
 #include<unordered_set>
+#include <set>
 
 using namespace std;
 
@@ -28,6 +29,9 @@ int lengthOfLongestSubstring(string s) {
 }
 
 int main() {
-    cout << lengthOfLongestSubstring("abcabcbb");
+    set<int> s{1,2,3,4};
+    s.insert(1);
+    s.insert(2);
+    s.insert(3);
 
 }
