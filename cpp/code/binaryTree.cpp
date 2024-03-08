@@ -617,9 +617,60 @@ public:
 
     // 257.二叉树的所有路径
     vector<string> binaryTreePaths(TreeNode* root) {
-
+        vector<vector<string>> res_;
+        vector<string> res;
+        backtracking_bingaryTreePaths(res_, root, vector<string>());
+        for(vector<vector<string>>:: iterator it1 = res_.begin(); it1 != res_.end(); it1++){
+            string tmp;
+            vector<string>:: iterator it2 = (*it1).begin();
+            for(; it2 != (*it1).end()-1; it2++){
+                tmp += *it2;
+                tmp += "->";
+            }
+            tmp+=*it2;
+            res.push_back(tmp);
+        }
+        return res;
     }
 
+    void backtracking_bingaryTreePaths(vector<vector<string>>& res, TreeNode *node, vector<string> path){
+        if(node == NULL) return;
+        path.push_back(to_string(node->val));
+        if(node->left == NULL and node->right == NULL){
+            res.push_back(path);
+        }
+        else{
+            backtracking_bingaryTreePaths(res, node->left, path);
+            backtracking_bingaryTreePaths(res, node->right, path);
+        }
+    }
+
+    vector<string> binaryTreePaths_ref(TreeNode* root) {
+        vector<string> res;
+        if(root != NULL){
+            backtracking_binaryTreePaths_ref(root, "", res);
+        }
+        return res;
+    }
+
+    void backtracking_binaryTreePaths_ref(TreeNode *node, string path, vector<string>& res){
+        path += to_string(node->val);
+        if(node->left == NULL && node->right==NULL){
+            res.push_back(path);
+        }
+        else{
+            if(node->left){
+                backtracking_binaryTreePaths_ref(node->left, path + "->", res);
+            }
+            if(node->right){
+                backtracking_binaryTreePaths_ref(node->right, path + "->", res);
+            }
+        }
+    }
+
+
+    // 404 左叶子之和
+    
 
 };
 
