@@ -670,6 +670,48 @@ public:
 
 
     // 404 左叶子之和
+    int sumOfLeftLeaves_my(TreeNode* root) {
+        if(root == NULL) return 0;
+        if(root->left != NULL){
+            if(root->left->left == NULL && root->left->right == NULL){
+                return root->left->val + sumOfLeftLeaves_my(root->right);
+            } 
+            else{
+                return sumOfLeftLeaves_my(root->left) + sumOfLeftLeaves_my(root->right);
+            }
+
+        }
+        else{
+            return sumOfLeftLeaves_my(root->right);
+        }
+    }
+
+    int sumOfLeftLeaves(TreeNode* root){
+        if(root == NULL) return 0;
+        int leftValue = 0;
+        if (root->left && !root->left->left && !root->left->right) { // 左子树就是一个左叶子的情况
+            leftValue = root->left->val;
+        }
+        return sumOfLeftLeaves(root->left) + sumOfLeftLeaves(root->right) + leftValue;
+    }
+
+    // 迭代
+    int sumOfLeftLeaves_it(TreeNode* root){
+        stack<TreeNode*> st;
+        if(root == NULL) return 0;
+        st.push(root);
+        int result = 0;
+        while(!st.empty()){
+            TreeNode *node = st.top();
+            st.pop();
+            if (node->left != NULL && node->left->left == NULL && node->left->right == NULL) {
+                result += node->left->val;
+            }
+            if(node->left) st.push(node->left);
+            if(node->right) st.push(node->right);
+        }
+        return result;
+    }
     
 
 };
