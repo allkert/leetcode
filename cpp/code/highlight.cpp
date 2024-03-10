@@ -2,6 +2,8 @@
 # include<limits>
 # include<algorithm>
 # include<math.h>
+#include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -103,5 +105,38 @@ public:
     bool isBalanced(TreeNode* root) {
         int res = getHeight(root);
         return res == -1? false:true;
+    }
+
+        // 501 二叉搜索树中的众数
+    // 迭代
+    vector<int> findMode_it(TreeNode* root) {
+        TreeNode* pre = NULL;
+        TreeNode* cur = root;
+        int count = 0;
+        int maxcount = 0;
+        stack<TreeNode*> st;
+        vector<int> res;
+        while(!st.empty() or cur != NULL){
+            if(cur == NULL){
+                cur =st.top();st.pop();
+                if(pre == NULL) count = 1;
+                else if(pre->val == cur->val) count++;
+                else count = 1;
+                if(count == maxcount) res.push_back(cur->val);
+                if(count > maxcount){
+                    maxcount = count;
+                    res.clear();
+                    res.push_back(cur->val);
+                }
+                pre = cur;
+                cur = cur->right; 
+            }
+            else{
+                st.push(cur);
+                cur = cur->left;
+            }
+            
+        }
+        return res;
     }
 };

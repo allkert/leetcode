@@ -9,6 +9,13 @@
 
 using namespace std;
 
+void printvector(vector<int> v){
+    for(int num: v){
+        cout << num << '\t';
+    }
+    cout << endl;
+}
+
 class Node {
 public:
     int val;
@@ -765,16 +772,500 @@ public:
     }
 
     // 106. 从中序与后序遍历序列构造二叉树
-    TreeNode* buildTree1(vector<int>& inorder, vector<int>& postorder) {
-        int i = 0;
-        
+    TreeNode* buildTree_r_in_post(vector<int>& inorder, vector<int>& postorder) {
+        if(inorder.empty()) return NULL;
+        int midval = *postorder.rbegin();
+        int index;
+        for(int i = 0; i < inorder.size(); i++){
+            if(inorder[i] == midval){
+                index = i;
+                break;
+            }
+        }
+        TreeNode* node = new TreeNode(midval);
+        vector<int> inorderLeft = getSub(inorder, 0, index);
+        vector<int> inorderRight= getSub(inorder, index+1,inorder.size());
+        vector<int> postorderLeft = getSub(postorder, 0, index);
+        vector<int> postorderRight = getSub(postorder, index, postorder.size()-1);
+        node->left = buildTree_r_in_post(inorderLeft, postorderLeft);
+        node->right = buildTree_r_in_post(inorderRight, postorderRight);
+        return node;
+    }
+
+    vector<int> getSub(vector<int> origin, int start, int end){
+        vector<int> res;
+        for(int i = start; i < end; i++){
+            res.push_back(origin[i]);
+        }
+        return res;
+    }
+
+    // 这种写法占用空间很大，因为在函数中创建了int容器
+    TreeNode* traversalBuildTree_in_post_ref(vector<int>& inorder, vector<int>& postorder, int inorderbegin, int inorderend, int postorderbegin, int postorderend){
+        if(inorderbegin == inorderend) return NULL;
+        int rootval = postorder[postorderend-1];
+        TreeNode* node = new TreeNode(rootval);
+        int index = inorderbegin;
+        for(; index < inorderend; index++){
+            if(inorder[index] == rootval){
+                break;
+            }
+        }
+        node->left  = traversalBuildTree_in_post_ref(inorder, postorder, inorderbegin, index, postorderbegin, postorderbegin + index - inorderbegin);
+        node->right = traversalBuildTree_in_post_ref(inorder, postorder, index+1, inorderend, postorderbegin + index - inorderbegin, postorderend-1);
+        return node;
+    }
+
+    TreeNode* buildTree_in_post_ref(vector<int>& inorder, vector<int>& postorder){
+        return traversalBuildTree_in_post_ref(inorder, postorder, 0, inorder.size(), 0, postorder.size());
+    }
+
+
+    // 105. 从前序与中序遍历序列构造二叉树
+    TreeNode* buildTree_pre_in_traversal(vector<int> preorder, vector<int> inorder, int inorderBegin, int inorderEnd, int preorderBegin, int preorderEnd){
+        if(inorderBegin == inorderEnd) return NULL;
+        int rootVal = preorder[preorderBegin];
+        int index = inorderBegin;
+        for(; index < inorderEnd; index++){
+            if(inorder[index] == rootVal) break;
+        }
+        TreeNode* root = new TreeNode(rootVal);
+        root->left  = buildTree_pre_in_traversal(preorder, inorder, inorderBegin, index, preorderBegin+1, preorderBegin+1+index-inorderBegin);
+        root->right = buildTree_pre_in_traversal(preorder, inorder, index+1, inorderEnd, preorderBegin+1+index-inorderBegin, preorderEnd);
+        return root;
+    }
+
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        return buildTree_pre_in_traversal(preorder, inorder, 0, inorder.size(), 0, preorder.size());
+    }
+
+    // 最大二叉树
+    TreeNode* constructMaximumBinaryTree_Traversal(vector<int>& nums, int begin, int end){
+        if(begin == end) return nullptr;
+        int max_ = INT_MIN;
+        int maxIndex = -1;
+        // find the max
+        for(int i = begin; i < end; i++){
+            if(nums[i]>max_){
+                max_ = nums[i];
+                maxIndex = i;
+            }
+        }
+        TreeNode *root = new TreeNode(max_);
+        root->left  = constructMaximumBinaryTree_Traversal(nums, begin, maxIndex);
+        root->right = constructMaximumBinaryTree_Traversal(nums, maxIndex+1, end);
+        return root;
+    }
+    TreeNode* constructMaximumBinaryTree(vector<int>& nums) {
+        return constructMaximumBinaryTree_Traversal(nums, 0, nums.size());
+    }
+
+
+    // 617 合并二叉树
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) {
+        if(root1 == NULL && root2 == NULL) return NULL;
+        if(root1 != NULL && root2 != NULL){
+            root2->val += root1->val;
+            root2->left = mergeTrees(root1->left, root2->left);
+            root2->right = mergeTrees(root1->right, root2->right);
+            return root2;
+        }
+        if(root1 == NULL && root2 != NULL) return root2;
+        else return root1;
+    }
+
+    // 迭代解法
+    TreeNode* mergeTrees_it(TreeNode* root1, TreeNode *root2){
+        if(root1 == NULL) return root2;
+        if(root2 == NULL) return root1;
+        queue<TreeNode*> que;
+        que.push(root1);
+        que.push(root2);
+        while(!que.empty()){
+            TreeNode* node1 = que.front();que.pop();
+            TreeNode* node2 = que.front();que.pop();
+            node1->val += node2->val;
+            if(node1->left != NULL && node2->left != NULL){
+                que.push(node1->left);
+                que.push(node2->left);
+            }
+            if(node1->right != NULL && node2->right != NULL){
+                que.push(node1->right);
+                que.push(node2->right);
+            }
+
+            if(node1->left == NULL && node2->left != NULL){
+                node1->left = node2->left;
+            }
+
+            if(node1->right == NULL && node2->right != NULL){
+                node1->right = node2->right;
+            }
+            
+        }
+        return root1;
+    }
+
+
+    // 700 二叉搜索树中的搜索 
+    // 迭代
+    TreeNode* searchBST_it(TreeNode* root, int val) {
+        TreeNode *cur = root;
+        while(cur != NULL){
+            if(cur->val == val) return cur;
+            else if(val > cur->val) cur = cur->right;
+            else cur = cur->left;
+        }
+        return NULL;
+    }
+
+    TreeNode* searchBST(TreeNode* root, int val){
+        if(root == NULL) return NULL;
+        if(root->val < val) return searchBST(root->right, val);
+        if(root->val == val) return root;
+        return searchBST(root->left, val);
+    }
+
+    // 98 验证二叉搜索树
+    bool isValidBST_Traversal(TreeNode* root ,long lowerBound, long upperBound){
+        if(root == NULL) return true;
+        if(root->val <= lowerBound || root->val >= upperBound) return false;
+        return (isValidBST_Traversal(root->left, lowerBound, root->val) && isValidBST_Traversal(root->right, root->val, upperBound));
+    }
+
+    bool isValidBST(TreeNode* root) {
+        return isValidBST_Traversal(root, LONG_MIN, LONG_MAX);
+    }
+
+    // 530 二叉搜索树的最小绝对差
+    // 迭代
+    int getMinimumDifference(TreeNode* root) {
+        TreeNode* pre = new TreeNode(-100001);
+        TreeNode* cur = root;
+        int minGap = INT_MAX;
+        stack<TreeNode*> st;
+        while(!st.empty() or cur != NULL){
+            if(cur == NULL){
+                cur = st.top();st.pop();
+                minGap = min(minGap, cur->val - pre->val);
+                pre = cur;
+                cur = cur->right;
+            }
+            else{
+                st.push(cur);
+                cur = cur->left;
+            }
+        }
+        return minGap;
+    }
+
+
+    // 236. 二叉树的最近公共祖先
+    TreeNode* lowestCommonAncestor1(TreeNode* root, TreeNode* p, TreeNode* q) {
+        string pPath = findPath(root, p->val, "1");
+        string qPath = findPath(root, q->val, "1");
+        int index = 1;
+        TreeNode* node = root;
+        while(1){
+            if(pPath[index] == qPath[index]){
+                if(pPath[index] == '1'){
+                    node = node->left;
+                }
+                else{
+                    node = node->right;
+                }
+                index++;
+            }
+            else break;
+        }
+        return node;
+    }
+
+    string findPath(TreeNode *root,  int target, string path){
+        if(root == NULL) return "false";
+        if(root->val == target) return path;
+        string leftPath  = findPath(root->left,  target, path+"1");
+        string rightPath = findPath(root->right, target, path+"0");
+        if(leftPath != "false") return leftPath;
+        if(rightPath != "false") return rightPath;
+        return "false";
+    }
+
+    TreeNode* lowestCommonAncestor2(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root->val == p->val) return p;
+        if(root->val == q->val) return q;
+        TreeNode* cur = root;
+        while(cur != nullptr){
+            bool pInLeft = traversal_exist(root->left, p->val);
+            bool qInLeft = traversal_exist(root->left, q->val);
+            if(pInLeft && qInLeft) cur = cur->left;
+            else if(!pInLeft && !qInLeft) cur = cur->right;
+            else return cur;
+        }
+    }
+
+    bool traversal_exist(TreeNode* root, int val){
+        if(root == NULL) return false;
+        if(root->val == val) return true;
+        return traversal_exist(root->left, val) or traversal_exist(root->right, val);
+    }
+
+    // 答案递归
+    TreeNode* lowestCommonAncestor3(TreeNode* root, TreeNode* p, TreeNode *q){
+        if(root == q || root == p || root == NULL) return root;
+        TreeNode* left = lowestCommonAncestor3(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor3(root->right, p, q);
+        if(left != NULL && right != nullptr) return root;
+        if(left == NULL && right != NULL) return right;
+        else if (left != NULL && right == NULL) return left;
+        else return nullptr;
+    }
+
+    // 235. 二叉搜索树的最近公共祖先
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root->val > p->val && root->val > q->val){
+            return lowestCommonAncestor(root->left, p, q);
+        }
+        else if(root->val < p->val && root->val < q->val){
+            return lowestCommonAncestor(root->right, p, q);
+        }
+        return root;
+    }
+
+    TreeNode* lowestCommonAncestor_it_235(TreeNode* root, TreeNode* p, TreeNode* q){
+        while(root != nullptr){
+            if(root->val > p->val && root->val >q->val){
+                root = root->left;
+            }
+            else if(root->val < p->val && root->val < q->val){
+                root = root->right;
+            }
+            else break;
+        }
+        return root;
+    }
+
+    //  701 二叉树的插入操作
+    TreeNode* insertIntoBST(TreeNode* root, int val) {
+        TreeNode* res = root;
+        if(root == NULL) return new TreeNode(val);
+        TreeNode* pre = NULL;
+        int tag;
+        while(root != NULL){
+            pre = root;
+            if(root->val < val){
+                root = root->right;
+                tag = 1;
+            }
+            else{
+                root = root->left;
+                tag = 0;
+            }
+        }
+        if(tag == 1) pre->right = new TreeNode(val);
+        else pre->left = new TreeNode(val);
+        return res;
+    }
+
+    // 450 删除二叉搜索树中的节点
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if(root == NULL) return root;
+        if(root->val > key){
+            root->left = deleteNode(root->left, key);
+            return root;
+        }
+        else if(root->val < key){
+            root->right = deleteNode(root->right, key);
+            return root;
+        }
+        else{
+            if(root->left == NULL && root->right == NULL){
+                delete root;
+                return NULL;
+            }
+            else if(root->left == NULL){
+                TreeNode* res = root->right;
+                delete root;
+                return res;
+            }
+            else if(root->right == NULL){
+                TreeNode* res = root->left;
+                delete root;
+                return res;
+            }
+            else{
+                TreeNode* cur = root->right;
+                while(cur->left != NULL) cur =cur->left;
+                cur->left = root->left;
+                TreeNode*tmp = root;
+                root = root->right;
+                delete tmp;
+                return root;
+            }
+        }
+    }
+
+    // 669修剪二叉搜索树
+    TreeNode* trimBST(TreeNode* root, int low, int high) {
+        if(root == NULL) return root;
+        if(root->val >= low && root->val <= high){
+            root->left = trimBST(root->left, low, high);
+            root->right = trimBST(root->right, low, high);
+            return root;
+        }
+        else if(root->val > high){
+            return trimBST(root->left, low, high);
+        }
+        else{
+            return trimBST(root->right, low, high);
+        }
+    }
+
+    TreeNode* trimBST_it(TreeNode* root, int low, int high){
+        if(root == NULL) return NULL;
+        // 先找到在val在范围内的root
+        while(root != NULL){
+            if(root->val < low) {
+                root = root->right;
+            }
+            else if(root->val > high){
+                root = root->left;
+            }
+            else break;
+        }
+        TreeNode* cur = root;
+        while(cur && cur->left){
+            if(cur->left->val < low){
+                cur->left = cur->left->right;
+            }
+            else cur = cur->left;
+        }
+
+        cur = root;
+        while(cur && cur->right){
+            if(cur->right->val > high){
+                cur->right = cur->right->left;
+            }
+            else cur = cur->right;
+        }
+        return root;
+    }
+
+    // 108. 将有序数组转换为二叉搜索树
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return sortedArrayToBST_Traversal(nums, 0, nums.size());
+    }
+
+    TreeNode* sortedArrayToBST_Traversal(vector<int>& nums, int begin, int end){
+        if(begin == end) return NULL;
+        int mid =(end + begin - 1)/2;
+        TreeNode* root = new TreeNode(nums[mid]);
+        root->left = sortedArrayToBST_Traversal(nums, begin, mid);
+        root->right = sortedArrayToBST_Traversal(nums, mid+1, end);
+        return root;
+    }
+
+    TreeNode* sortedArrayToBST_it(vector<int>& nums){
+        if (nums.size() == 0) return nullptr;
+
+        TreeNode* root = new TreeNode(0);
+        queue<TreeNode*> nodeQue;
+        queue<int> leftQue, rightQue;
+        nodeQue.push(root); 
+        leftQue.push(0);                    // 0为左区间下标初始位置
+        rightQue.push(nums.size() - 1);
+        while(!nodeQue.empty()){
+            TreeNode* curNode = nodeQue.front(); nodeQue.pop();
+            int left = leftQue.front();leftQue.pop();
+            int right = rightQue.front();rightQue.pop();
+            int mid = (left+right)/2;
+            curNode->val = nums[mid];
+            if(left <= mid -1){
+                curNode->left = new TreeNode(0);
+                nodeQue.push(curNode->left);
+                leftQue.push(left);
+                rightQue.push(mid-1);
+            }
+            if(right >= mid+1){
+                curNode->right = new TreeNode(0);
+                nodeQue.push(curNode->right);
+                leftQue.push(mid + 1);
+                rightQue.push(right);
+            }
+        }
+        return root;
+    }
+
+    // 538. 把二叉搜索树转换为累加树
+    TreeNode* convertBST(TreeNode* root) {
+        if(root == NULL) return root;
+        stack<TreeNode*> st;
+        int acc = 0;
+        TreeNode* cur = root;
+        while(!st.empty() || cur!=NULL){
+            if(cur == NULL){
+                cur = st.top();st.pop();
+                acc += cur->val;
+                cur->val = acc;
+                cur = cur->left;
+            }
+            else{
+                st.push(cur);
+                cur = cur->right;
+            }
+        }
+        return root;
     }
 
 };
 
-int main(){
-    for(int i = 0; i < 5; i++){
-        i++;
-        cout<<"this is a loop" <<endl;
+class Solution_findMode{
+public:
+    // 501 二叉搜索树中的众数
+    // 迭代
+    vector<int> findMode_it(TreeNode* root) {
+        TreeNode* pre = NULL;
+        TreeNode* cur = root;
+        int count = 0;
+        int maxcount = 0;
+        stack<TreeNode*> st;
+        vector<int> res;
+        while(!st.empty() or cur != NULL){
+            if(cur == NULL){
+                cur =st.top();st.pop();
+                if(pre == NULL) count = 1;
+                else if(pre->val == cur->val) count++;
+                else count = 1;
+                if(count == maxcount) res.push_back(cur->val);
+                if(count > maxcount){
+                    maxcount = count;
+                    res.clear();
+                    res.push_back(cur->val);
+                }
+                pre = cur;
+                cur = cur->right; 
+            }
+            else{
+                st.push(cur);
+                cur = cur->left;
+            }
+            
+        }
+        return res;
     }
+
+};
+
+
+
+int main(){
+    Solution s;
+    TreeNode* node1 = new TreeNode(1);
+    TreeNode* node2 = new TreeNode(2);
+    TreeNode* node3 = new TreeNode(3);
+    TreeNode* node4 = new TreeNode(4);
+    TreeNode* node5 = new TreeNode(5);
+    node1->right = node2;
+    TreeNode* ress =  s.trimBST_it(node1, 2,4);
+    cout<<ress->val;
 }
