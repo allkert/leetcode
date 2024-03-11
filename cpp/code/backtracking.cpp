@@ -254,6 +254,94 @@ public:
     }
 };
 
+
+// 90 子集Ⅱ
+class Solution_90 {
+private:
+    vector<vector<int>> res;
+    vector<int> path;
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        backtracking(nums, 0);
+        return res;
+    }
+    void backtracking(vector<int>& nums, int startIndex){
+        res.push_back(path);
+        if(startIndex >= nums.size()) return;
+        for(int i = startIndex; i < nums.size(); i++){
+            if(i > startIndex && nums[i] == nums[i-1]){
+                continue;
+            }
+            path.push_back(nums[i]);
+            backtracking(nums, i+1);
+            path.pop_back();
+        }
+    }
+};
+
+
+// 非递减子序列
+class Solution_491 {
+private:
+    vector<vector<int>> res;
+    vector<int> path;
+public:
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        backtracking(nums, 0);
+        return res;
+    }
+    void backtracking(vector<int>& nums, int startIndex){
+        if(path.size() >= 2) res.push_back(path);
+        if(startIndex >= nums.size()) return;
+        for(int i = startIndex; i < nums.size(); i++){
+            if(i > startIndex && find(nums.begin()+startIndex, nums.begin()+i, nums[i]) != nums.begin()+i) 
+                continue;
+            if(path.empty() || nums[i] >= path[path.size()-1]){
+                path.push_back(nums[i]);
+                backtracking(nums, i+1);
+                path.pop_back();
+            }
+        }
+    }
+};
+
+class Solution_46 {
+private:
+    vector<vector<int>> res;
+    vector<int> path;
+public:
+    void backtracking(vector<bool>& used, vector<int>& nums){
+        if(path.size() == nums.size()){
+            res.push_back(path);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++){
+            if(!used[i]){
+                path.push_back(nums[i]);
+                used[i] = true;
+                backtracking(used, nums);
+                used[i] = false;
+                path.pop_back();
+            }
+        }
+    }
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<bool> used(nums.size(), false);
+        backtracking(used, nums);
+        return res;
+    }
+};
+
 int main(){
-    return 0;
+    Solution_491 s;
+    vector<int> a{1,2,3,1,1,1};
+    vector<vector<int>> res = s.findSubsequences(a);
+    for(int i = 0; i < res.size(); i++){
+        for(int j = 0; j < res[i].size(); j++){
+            cout<<res[i][j]<<'\t';
+        }
+        cout << endl;
+    }
+    
 }
