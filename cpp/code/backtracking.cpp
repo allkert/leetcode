@@ -333,6 +333,49 @@ public:
     }
 };
 
+class Solution_47{
+private:
+    vector<vector<int>> res;
+    vector<int> path;
+public:
+    void backtracking(vector<int>& nums, vector<bool>& used){
+        if(path.size() == nums.size()){
+            res.push_back(path);
+            return;
+        }
+        for(int i = 0; i < nums.size(); i++){
+            if(i != 0 && nums[i] == nums[i-1] && !used[i-1]) continue;
+            if(used[i]) continue;
+            path.push_back(nums[i]);
+            used[i] = true;
+            backtracking(nums, used);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<bool> used(nums.size(), false);
+        backtracking(nums, used);
+        return res;
+    }
+
+};
+
+class Solution_332{
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets) {
+        
+    }
+
+    bool compare(vector<string> a, vector<string> b){
+        for(int i = 0; i < a[1].size(); i++){
+            if(a[1].at(i) > b[1].at(i)) return true;
+            else if(a[1].at(i) < b[1].at(i)) return false;
+        }
+        return true;
+    }
+};
+
 int main(){
     Solution_491 s;
     vector<int> a{1,2,3,1,1,1};
