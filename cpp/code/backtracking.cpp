@@ -106,7 +106,7 @@ public:
 
 
 // 40. 组合总和 II
-class Solution_40 {
+class Solution_40_1 {
 private:
     vector<int> path;
     vector<vector<int>> res;
@@ -116,7 +116,8 @@ public:
             res.push_back(path);
             return;
         }
-        for(int i = index; i < candidates.size() && candidates[i] < target; i++){
+        for(int i = index; i < candidates.size() && candidates[i] <= target; i++){
+            if(i!=0 and candidates[i]==candidates[i-1]) continue;
             path.push_back(candidates[i]);
             backtracking(candidates, i + 1, target - candidates[i]);
             path.pop_back();
@@ -129,6 +130,72 @@ public:
         return res;
     }
 };
+
+// 131分割回文串
+class Solution_131 {
+private:
+    vector<vector<string>> res;
+    vector<string> path;
+public:
+    bool isPalindrome(string s, int begin, int end){
+        while(begin<end){
+            if(s[begin++] != s[end++]) return false;
+        }
+        return true;
+    }
+    vector<vector<string>> partition(string s) {
+        backtracking(s, 0);
+        return res;
+    }
+    void backtracking(string s, int start){
+        if(start == s.length()) res.push_back(path);
+        for(int i = start; i < s.length(); i++){
+            if(isPalindrome(s, start, i)){
+                path.push_back(s.substr(i, start-i+1));
+                backtracking(s, i+1);
+                path.pop_back();
+            }
+        }
+    }
+};
+
+// 93复原IP地址
+class Solution_93 {
+private:
+    vector<string> res;
+public:
+    void backtracking(string s, int startIndex, int tag, string path){
+        if(startIndex >= s.length()){
+            if(tag == 0){
+                path.resize(path.length()-1);
+                res.push_back(path);
+            }
+            return;
+        }
+        if(s[startIndex] == '0'){
+            backtracking(s, startIndex+1, tag-1, path+'0'+'.');
+        }
+        else{
+            for(int i = 1; i <= 3 && startIndex+i <= s.length(); i++){
+                int singleIP = stoi(s.substr(startIndex, i));
+                if(singleIP <= 255){
+                    backtracking(s, startIndex+i, tag-1, path+s.substr(startIndex, i)+'.');
+                }
+            }
+        }
+    }
+    vector<string> restoreIpAddresses(string s) {
+        backtracking(s, 0, 4, "");
+        return res;
+    }
+};
+
+// 参考
+class Solution_39_ref{
+    vector<int> res;
+    void backtracking(string& s, int startIndex, int)
+};
+
 
 int main(){
     return 0;
