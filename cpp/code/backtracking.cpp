@@ -362,29 +362,63 @@ public:
 };
 
 class Solution_332{
+private:
+    vector<string> res;
 public:
     vector<string> findItinerary(vector<vector<string>>& tickets) {
-        
+        quicksort(tickets, 0, tickets.size());
+        backtracking(tickets, vector<bool>(tickets.size(), false), "JFK");
+        return res;
+    }
+
+    void quicksort(vector<vector<string>>& tickets, int beginIndex, int endIndex){
+        int left = beginIndex, right = endIndex;
+        if(left >= right) return;
+        int midTag = beginIndex;
+        while(left < right){
+            while(left < right && compare(tickets[midTag], tickets[right])) right--;
+            if(left < right){
+                swap(tickets[midTag], tickets[right]);
+                midTag = right;
+            }
+            while(left < right && compare(tickets[left], tickets[midTag])) left++;
+            if(left < right){
+                swap(tickets[left], tickets[midTag]);
+                midTag = left;
+            }
+    }
+    quicksort(tickets, beginIndex, midTag-1);
+    quicksort(tickets, midTag+1, endIndex);
     }
 
     bool compare(vector<string> a, vector<string> b){
         for(int i = 0; i < a[1].size(); i++){
-            if(a[1].at(i) > b[1].at(i)) return true;
-            else if(a[1].at(i) < b[1].at(i)) return false;
+            if(a[1].at(i) > b[1].at(i)) return false;
+            else if(a[1].at(i) < b[1].at(i)) return true;
         }
         return true;
+    }
+
+    bool backtracking(vector<vector<string>>& tickets, vector<bool> used, string place){
+        if(res.size() == tickets.size()) return true;
+        for(int i = 0; i < tickets.size(); i++){
+            if(!used[i] && tickets[i][0] == place){
+                used[i] = true;
+                res.push_back(tickets[i]);
+                if(backtracking(tickets, used, tickets[i][1])){
+                    return true;
+                }
+                used[i] = false;
+                res.pop_back();
+            }
+        }
+        return false;
     }
 };
 
 int main(){
-    Solution_491 s;
-    vector<int> a{1,2,3,1,1,1};
-    vector<vector<int>> res = s.findSubsequences(a);
-    for(int i = 0; i < res.size(); i++){
-        for(int j = 0; j < res[i].size(); j++){
-            cout<<res[i][j]<<'\t';
-        }
-        cout << endl;
-    }
-    
+    // Solution_332 s;
+    vector<vector<string>> a{{"MUC","LHR"},{"JFK","MUC"},{"SFO","SJC"},{"LHR","SFO"}};
+
+
 }
