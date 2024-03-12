@@ -450,7 +450,108 @@ public:
     }
 };
 
+// 51 N皇后
+class Solution_51 {
+private:
+    vector<vector<string>> res;
+    vector<string> path;
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        path = vector<string> (n, string(n,'.'));
+        backtracking(0, n);
+        return res;
+    }
+    bool check(int row, int col, int n){
+        // check line and rou
+        for(int i = 0; i < n; i++){
+            if(path[row][i] != '.' || path[i][col] != '.') return false;
+        }
+        // 对角线
+        int diagonalRow = row - min(row, col);
+        int diagonalCol = col - min(row, col);
+        while(diagonalRow < n && diagonalCol < n){
+            if(path[diagonalRow++][diagonalCol++] != '.') return false;
+        }
+        // 反对角线
+        int antiDiagonalRow, antiDiagonalCol;
+        if(row + col < n - 1){
+            antiDiagonalRow = row + col;
+            antiDiagonalCol = 0;
+        }
+        else{
+            antiDiagonalRow = n - 1;
+            antiDiagonalCol = col - (n - 1 - row);
+        }
+        while(antiDiagonalRow >= 0 && antiDiagonalCol < n){
+            if(path[antiDiagonalRow--][antiDiagonalCol++] != '.') return false;
+        }
+        return true;
+    }
+
+    void backtracking(int row, int n){
+        if(row == n){
+            res.push_back(path);
+            return;
+        }
+        for(int i = 0; i < n; i++){
+            if(check(row, i, n)){
+                path[row][i] = 'Q';
+                backtracking(row+1, n);
+                path[row][i] = '.';
+            }
+        }
+    }
+
+};
+
+// 37 解数独
+class Solution_37 {
+public:
+    void solveSudoku(vector<vector<char>>& board) {
+        backtracking(board, 0, 0);
+    }
+
+    bool check(vector<vector<char>>& board, int row, int col, char put){
+        // check row and col
+        for(int i = 0; i < 9; i++){
+            if(board[row][i] == put || board[i][col] == put) return false;
+        }
+        // check 3x3
+        row -= row%3;
+        col -= col%3;
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(board[row+i][col+j] == put) return false;
+            }
+        }
+        return true;
+    }
+
+    bool backtracking(vector<vector<char>>& board, int row, int col){
+        if(col == 9){
+            col = 0;
+            row++;
+        }
+        if(row == 9){
+            return true;
+        }
+        if(board[row][col]!='.'){
+            return backtracking(board, row, col+1);
+        }
+        for(char ch = '1'; ch <= '9'; ch++){
+            if(check(board, row, col, ch)){
+                board[row][col] = ch;
+                if(backtracking(board, row, col+1)) return true;
+                board[row][col] = '.';
+            }
+        }
+        return false;
+    }
+};
+
 int main(){
-
-
+    char a = '1';
+    a++;
+    cout<<a;
+    Solution_51 s;
 }
