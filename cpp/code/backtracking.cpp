@@ -7,6 +7,7 @@
 # include<stack>
 # include<list>
 # include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -363,11 +364,12 @@ public:
 
 class Solution_332{
 private:
-    vector<string> res;
+    vector<string> res = {"JFK"};
 public:
     vector<string> findItinerary(vector<vector<string>>& tickets) {
-        quicksort(tickets, 0, tickets.size());
-        backtracking(tickets, vector<bool>(tickets.size(), false), "JFK");
+        vector<bool> used(tickets.size(), false);
+        quicksort(tickets, 0, tickets.size()-1);
+        backtracking(tickets, used, "JFK");
         return res;
     }
 
@@ -399,12 +401,12 @@ public:
         return true;
     }
 
-    bool backtracking(vector<vector<string>>& tickets, vector<bool> used, string place){
-        if(res.size() == tickets.size()) return true;
+    bool backtracking(vector<vector<string>>& tickets, vector<bool>& used, string place){
+        if(res.size() == tickets.size()+1) return true;
         for(int i = 0; i < tickets.size(); i++){
             if(!used[i] && tickets[i][0] == place){
                 used[i] = true;
-                res.push_back(tickets[i]);
+                res.push_back(tickets[i][1]);
                 if(backtracking(tickets, used, tickets[i][1])){
                     return true;
                 }
@@ -416,9 +418,39 @@ public:
     }
 };
 
+class Solution_332_ref{
+private:
+    unordered_map<string, map<string, int>> targets;
+    
+    bool backtracking(int ticketNum, vector<string>& result){
+        if(result.size() == ticketNum + 1){
+            return true;
+        }
+        for(pair<const string ,int>& target: targets[result[result.size() - 1]]){
+            if(target.second > 0){
+                result.push_back(target.first);
+                target.second--;
+                if(backtracking(ticketNum, result)) return true;
+                result.pop_back();
+                target.second++;
+            }
+        }
+        return false;
+    }
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets){
+        targets.clear();
+        vector<string> result;
+        for(const vector<string>& vec: tickets){
+            targets[vec[0]][vec[1]]++;
+        }
+        result.push_back("JKF");
+        backtracking(tickets.size(), result);
+        return result;
+    }
+};
+
 int main(){
-    // Solution_332 s;
-    vector<vector<string>> a{{"MUC","LHR"},{"JFK","MUC"},{"SFO","SJC"},{"LHR","SFO"}};
 
 
 }
