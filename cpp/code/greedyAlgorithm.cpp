@@ -40,7 +40,7 @@ public:
         return (dp[0] > dp [1])? dp[0]:dp[1];
     }
 
-    int wiggleMaxLength_dp(vector<int>& nums){
+    int wiggleMaxLength_greedy(vector<int>& nums){
         if(nums.size() == 1) return 1;
         int preDif = 0;
         int curDif = 0;
@@ -85,4 +85,44 @@ public:
         }
         return dp[0];
     }
+
+
+    // 55. 跳跃游戏
+    bool canJump(vector<int>& nums) {
+        int maxJumpIndex = 0;
+        int length = nums.size();
+        for(int i = 0; i < maxJumpIndex; i++){
+            maxJumpIndex = max(maxJumpIndex, i + nums[i]);
+            if(maxJumpIndex >= length) return true;
+        }
+        return false;
+    }
+
+    // 45跳跃游戏Ⅱ
+    int jump(vector<int>& nums) {
+        if(nums.size() == 1) return 0;
+        int i = 0;
+        int cover = nums[i];
+        int step = 0;
+        while(cover < nums.size()){
+            int nextPlace = i;
+            int nextCover = cover;
+            for(int j = i; j <= cover; j++){
+                if(j + nums[j] > nextCover){
+                    nextPlace = j;
+                    nextCover = j + nums[j];
+                }
+            }
+            step++;
+            cover = nextCover;
+            i = nextPlace;
+        }
+        return step;
+    }
 };
+
+int main(){
+    Solution s;
+    vector<int> a{2,3,1,1,4};
+    cout << s.jump(a) << endl;
+}
