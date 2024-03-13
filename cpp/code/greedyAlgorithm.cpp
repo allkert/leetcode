@@ -2,6 +2,8 @@
 # include<vector>
 # include<limits>
 # include <algorithm>
+# include<numeric>
+#include <list>
 
 using namespace std;
 
@@ -173,15 +175,174 @@ public:
     }
 
     // 134. 加油站
-    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+    // 暴力搜索的方法，复杂度是o(n^2)会超时
+    int canCompleteCircuit_1(vector<int>& gas, vector<int>& cost) {
+       if(accumulate(gas.begin(), gas.end(), 0) < accumulate(cost.begin(), cost.end(), 0)) return -1;
+       int V = 0;
+       for(int i = 0; i < gas.size(); i++){
+            if(gas[i] < cost[i]) continue;
+            if(checkGas(gas, cost, i)) return i;
+       }
+       return -1;
+    }
+
+    bool checkGas(vector<int>& gas, vector<int>& cost, int begin){
+        int V = 0;
+        for(int i = begin; i < gas.size(); i++){
+            V += gas[i]-cost[i];
+            if(V < 0) return false;
+        }
+        for(int j = 0; j < begin; j++){
+            V += gas[j]-cost[j];
+            if(V < 0) return false;
+        }
+        return true;
+    }
+
+    // 贪心算法
+    int canCompleteCircuit_greedy(vector<int>& gas, vector<int>& cost){
+        int totalGas = 0;
+        int curGas = 0;
+        int res = 0;
+        for(int i = 0; i < cost.size(); i++){
+            curGas += gas[i] - cost[i];
+            totalGas += gas[i] - cost[i];
+            if(curGas < 0){
+                res = i + 1;
+                curGas = 0;
+            }
+        }
+        if(totalGas < 0) return -1;
+        return res;
+    }
+
+    //135 分发糖果
+    int candy(vector<int>& ratings) {
+        vector<int> candyVec(ratings.size(),1);
+        for(int i = 1; i < ratings.size(); i++){
+            if (ratings[i] > ratings[i - 1]) candyVec[i] = candyVec[i - 1] + 1;
+        }
+        for (int i = ratings.size() - 2; i >= 0; i--) {
+            if (ratings[i] > ratings[i + 1] ) {
+                candyVec[i] = max(candyVec[i], candyVec[i + 1] + 1);
+            }
+        }
+        return accumulate(candyVec.begin(), candyVec.end(), 0);
+    }
+
+    //860 柠檬水找零
+    bool lemonadeChange(vector<int>& bills) {
+        int changeFive = 0;
+        int changeTen = 0;
+        for(int bill: bills){
+            if(bill == 5) changeFive++;
+            else if(bill == 10){
+                changeFive--;
+                changeTen++;
+            }
+            else{
+                if(changeTen <= 0) changeFive -= 3;
+                else{
+                    changeFive -= 1; 
+                    changeTen -= 1;
+                }
+            }
+            cout << changeFive << changeTen << endl;
+            if(changeTen < 0 || changeFive < 0) return false;
+        }
+        return true;
+    }
+
+    // 406 根据身高重新构建队列
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        sort(people.begin(), people.end(), cmp);
+        vector<vector<int>> res(people.size(), {-1, -1});
+        for(vector<int> p: people){
+            int i = 0, pos = -1;
+            for(; i < res.size() && pos < p[1]; i++){
+                if(res[i][1] == -1 || res[i][0] >= p[0] ){
+                    pos++;
+                }
+            }
+            res[i - 1] = p;
+        }
+        return res;
+    }
+
+    vector<vector<int>> reconstructQueue_Ref(vector<vector<int>>& people){
+        sort(people.begin(), people.end(), cmpref);
+        list<vector<int>> que;
+        for(int i = 0; i < people.size(); i++){
+            int position = people[i][1];
+            std::list<vector<int>>::iterator it = que.begin();
+            while (position--) { // 寻找在插入位置
+                it++;
+            }
+            que.insert(it, people[i]);
+        }
+        return vector<vector<int>>(que.begin(), que.end());
+    }
+
+    // 452 用最少数量的箭引爆气球
+    int findMinArrowShots(vector<vector<int>>& points) {
+        sort(points.begin(), points.end(), compare452);
+        int res = 1;
+        int left = points[0][0], right = points[0][1];
+        for(int i = 1, left = points[0][0], right = points[0][1]; i < points.size(); i++){
+            if(points[i][0] >= left && points[i][0] <= right){
+                left = max(left, points[i][0]);
+                right = min(right, points[i][1]);
+            }
+            else{
+                left = points[i][0];
+                right = points[i][1];
+                res++;
+            }
+        }
+        return res;
         
+    }
+
+    // 435. 无重叠区间
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end(), compare452);
+        int res = 0;
+        cout<<"!!!";
+        for(int i = 1, right = intervals[0][1]; i < intervals.size(); i++){
+            if(intervals[i][0] >= right){
+                right = intervals[i][1];
+            }
+            else{
+                res++;
+                if(intervals[i][1] <= right){
+                    right = intervals[i][1];
+                }
+            }
+        }
+        return res;
+    }
+
+
+private:
+    static bool cmp(vector<int> a, vector<int> b){
+        if(a[0] == b[0]) return (a[1] <= b[1]);
+        else return(a[0] < b[0]);
+    }
+
+    static bool cmpref(const vector<int>& a, const vector<int>& b) {
+        if (a[0] == b[0]) return a[1] < b[1];
+        return a[0] > b[0];
+    }
+
+    static bool compare452(vector<int>& a, vector<int>& b){
+        return (a[0] < b[0]);
     }
 
 };
 
 int main(){
     Solution s;
-    vector<int> a{5,6,9,-3,-3};
-    s.quickSortAbs(a, 0, a.size()-1);
-    for(int num: a) cout <<num<<'\t';
+    vector<vector<int>> a{{-23,10},{-32,72},{-34,-8},{13,56},{-4,17},{-95,9},{99,100},{83,100},{2,5},{-28,-17},{19,91},{2,92},{-32,40},{-50,-17},{-28,18},{31,33},{-86,26},{-95,40},{96,98},{-50,-36},{48,68},{-40,-28},{-95,44},{-63,76},{-38,52},{66,83},{12,45},{-89,65},{-78,34},{29,93},{-68,41},{3,35},{9,83},{60,89},{-74,-33},{-55,36},{-71,-51},{-18,-1},{58,98},{4,17},{-73,-36},{-63,-36},{-73,5},{72,90},{92,96},{-92,-4},{37,73},{46,76},{-12,24},{-45,46},{-13,5},{64,95},{44,58},{-87,-70},
+    {-15,-11},{49,97},{69,83},{-41,10},{5,21},{-83,97},{-33,86},{35,39},{-57,39},{-70,-64},{92,99},{-37,96},{49,87},{-37,15},{99,100},{-67,60},{-95,6}};
+    cout<<s.eraseOverlapIntervals(a);
 }
