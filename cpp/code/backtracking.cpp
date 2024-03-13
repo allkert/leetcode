@@ -388,9 +388,9 @@ public:
                 swap(tickets[left], tickets[midTag]);
                 midTag = left;
             }
-    }
-    quicksort(tickets, beginIndex, midTag-1);
-    quicksort(tickets, midTag+1, endIndex);
+        }
+        quicksort(tickets, beginIndex, midTag-1);
+        quicksort(tickets, midTag+1, endIndex);
     }
 
     bool compare(vector<string> a, vector<string> b){

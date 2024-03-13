@@ -103,7 +103,7 @@ public:
         if(nums.size() == 1) return 0;
         int i = 0;
         int cover = nums[i];
-        int step = 0;
+        int step = 1;
         while(cover < nums.size()){
             int nextPlace = i;
             int nextCover = cover;
@@ -113,16 +113,75 @@ public:
                     nextCover = j + nums[j];
                 }
             }
+            if(cover >= nums.size()-1) break;
             step++;
             cover = nextCover;
             i = nextPlace;
         }
         return step;
     }
+
+    int jump1(vector<int>& nums){
+        if(nums.size() == 1) return 0;
+        int nextCover = 0;
+        int curCover = 0;
+        int step = 0;
+        for(int i = 0; i < nums.size(); i++){
+            nextCover = max(nextCover, i + nums[i]);
+            if(i == curCover){
+                step++;
+                curCover = nextCover;
+                if(curCover >= nums.size()-1) break;
+            }
+        }
+        return step;
+    }
+
+
+    // 1005. K 次取反后最大化的数组和
+    int largestSumAfterKNegations(vector<int>& nums, int k) {
+        quickSortAbs(nums, 0, nums.size()-1);
+        int sumResult = 0;
+        for(int i = 0; i < nums.size()-1; i++){
+            if(nums[i] < 0 && k > 0){
+                nums[i] = -nums[i];
+                k--;
+            }
+            sumResult += nums[i];
+        }
+        if(k % 2 == 0) return sumResult + nums[nums.size()-1];
+        else return sumResult - nums[nums.size()-1];
+    }
+    void quickSortAbs(vector<int>& nums, int beginIndex, int endIndex){
+        if(beginIndex >= endIndex) return;
+        int left = beginIndex, right = endIndex;
+        int tag = left;
+        while(left < right){
+            while(abs(nums[right]) <= abs(nums[tag]) && left < right) right--;
+            if(left < right){
+                swap(nums[right], nums[tag]);
+                tag = right;
+            }
+            while(abs(nums[left]) >= abs(nums[tag]) && left < right) left++;
+            if(left < right){
+                swap(nums[left], nums[tag]);
+                tag = left;
+            }
+        }
+        quickSortAbs(nums, beginIndex, tag-1);
+        quickSortAbs(nums, tag + 1, endIndex);
+    }
+
+    // 134. 加油站
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        
+    }
+
 };
 
 int main(){
     Solution s;
-    vector<int> a{2,3,1,1,4};
-    cout << s.jump(a) << endl;
+    vector<int> a{5,6,9,-3,-3};
+    s.quickSortAbs(a, 0, a.size()-1);
+    for(int num: a) cout <<num<<'\t';
 }
