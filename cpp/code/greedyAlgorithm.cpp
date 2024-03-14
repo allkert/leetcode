@@ -1,9 +1,10 @@
 # include<iostream>
 # include<vector>
 # include<limits>
-# include <algorithm>
+# include<algorithm>
 # include<numeric>
-#include <list>
+# include<list>
+# include<unordered_map>
 
 using namespace std;
 
@@ -322,6 +323,62 @@ public:
         return res;
     }
 
+    // 763. 划分字母区间
+    vector<int> partitionLabels(string s) {
+        unordered_map<char, int> lastAppear;
+        vector<int> res;
+        // 找到每个字母最后出现的位置
+        for(int i = 0; i < s.length(); i++){
+            lastAppear[s[i]] = i;
+        }
+        int last = -1;
+        int count = 0;
+        for(int i = 0; i < s.length(); i++){
+            last = max(last, lastAppear[s[i]]);
+            count++;
+            if(i == last){
+                last = -1;
+                res.push_back(count);
+                count = 0;
+            }
+        }
+        return res;
+    } 
+
+    // 56 合并区间
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        vector<vector<int>> res;
+        sort(intervals.begin(), intervals.end(), compare452);
+        int left = intervals[0][0], right = intervals[0][1];
+        for(int i = 1; i < intervals.size(); i++){
+            if(intervals[i][0] > right){
+                res.push_back({left, right});
+                left = intervals[i][0];
+                right = intervals[i][1];
+            }
+            else{
+                right = max(right, intervals[i][1]);
+            }
+        }
+        res.push_back({left, right});
+        return res;
+    }
+
+    // 738. 单调递增的数字
+    int monotoneIncreasingDigits(int n) {
+        string s = to_string(n);
+        int flag = s.length();
+        for(int i = s.length()-1; i >= 1; i--){
+            if(s[i-1] > s[i]){
+                s[i-1]--;
+                flag = i;
+            }
+        }
+        for(int i = flag; i < s.length(); i++){
+            s[i] = '9';
+        }
+        return stoi(s);
+    }
 
 private:
     static bool cmp(vector<int> a, vector<int> b){
@@ -342,7 +399,5 @@ private:
 
 int main(){
     Solution s;
-    vector<vector<int>> a{{-23,10},{-32,72},{-34,-8},{13,56},{-4,17},{-95,9},{99,100},{83,100},{2,5},{-28,-17},{19,91},{2,92},{-32,40},{-50,-17},{-28,18},{31,33},{-86,26},{-95,40},{96,98},{-50,-36},{48,68},{-40,-28},{-95,44},{-63,76},{-38,52},{66,83},{12,45},{-89,65},{-78,34},{29,93},{-68,41},{3,35},{9,83},{60,89},{-74,-33},{-55,36},{-71,-51},{-18,-1},{58,98},{4,17},{-73,-36},{-63,-36},{-73,5},{72,90},{92,96},{-92,-4},{37,73},{46,76},{-12,24},{-45,46},{-13,5},{64,95},{44,58},{-87,-70},
-    {-15,-11},{49,97},{69,83},{-41,10},{5,21},{-83,97},{-33,86},{35,39},{-57,39},{-70,-64},{92,99},{-37,96},{49,87},{-37,15},{99,100},{-67,60},{-95,6}};
-    cout<<s.eraseOverlapIntervals(a);
+    cout<<s.monotoneIncreasingDigits(187)<<endl;
 }
