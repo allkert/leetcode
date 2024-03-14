@@ -92,10 +92,52 @@ public:
         return *dp.crbegin();
     }
 
+    // 96. 不同的二叉搜索树
+    int numTrees(int n) {
+        vector<int> dp(n+1);
+        dp[0] = 1;
+        for(int i = 1; i <= n; i++){
+            for(int j = 0; j < i; j++){
+                dp[i] += dp[j]*dp[i-j-1];                
+            }
+        }
+        return dp[n];
+    }
+    
+
 };
 
+// 46. 携带研究材料（第六期模拟笔试）
+int KaMa_46(){
+    int m, n;
+    cin >> m;
+    cin >> n;
+    vector<int> weight(m);
+    vector<int> value(m);
+    for(int i = 0; i < m; i++){
+        cin >> weight[i];
+    }
+    for(int i = 0; i < m; i++){
+        cin >> value[i];
+    }
+    vector<int> dp(n+1);
+    for(int i = weight[0]; i <= n; i++){
+        dp[i] = value[0];
+    }
+    for(int epoch = 1; epoch < m; epoch++){
+        for(int j = n; j > 0; j--){
+            if(j >= weight[epoch]){
+                dp[j] = max(dp[j-weight[epoch]]+value[epoch], dp[j]);
+            }
+        }
+    }
+    cout << *dp.rbegin() << endl;
+}
+
 int main(){
-    Solution s;
-    vector<int> cost{10,15,20};
-    cout<<s.minCostClimbingStairs(cost);
+    int m;
+    int n;
+    cin >> m;
+    cin >> n;
+    cout << m<<endl;
 }

@@ -4,6 +4,9 @@
 # include<math.h>
 # include<limits>
 # include<string>
+# include <map>
+# include <unordered_map>
+# include<numeric>
 
 using namespace std;
 
@@ -158,6 +161,25 @@ public:
         }
         return false;
     }
+
+
+    // 49. 字母异位词分组
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        map<vector<int>, vector<string>> map;
+        vector<vector<string>> res;
+        for(string str:strs){
+            vector<int> count(26);
+            for(char ch: str){
+                count[ch-'a']++;
+            }
+            map[count].push_back(str);
+        }
+        for(auto a: map){
+            res.push_back(a.second);
+        }
+        return res;
+    }
+    unordered_map<string, string> a;
 };
 
 int main(){
