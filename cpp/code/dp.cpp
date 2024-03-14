@@ -2,6 +2,7 @@
 # include<vector>
 # include<numeric>
 # include<string>
+#include <unordered_map>
 
 using namespace std;
 
@@ -102,6 +103,62 @@ public:
             }
         }
         return dp[n];
+    }
+
+    // 416 分割等和子集
+    bool canPartition(vector<int>& nums) {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if(sum % 2 != 0) return false;
+        int bagSize = sum / 2;
+        vector<int> dp(bagSize + 1);
+        for(int i = nums[0]; i <= bagSize; i++){
+            dp[i] = nums[0];
+        }
+        for(int i = 1; i < nums.size(); i++){
+            for(int j = bagSize; j > 0; j--){
+                if(j >= nums[i]){
+                    dp[j] = max(dp[j], dp[j-nums[i]]+nums[i]);
+                }
+            }
+        }
+        if(*dp.rbegin() == bagSize) return true;
+        return false;
+    }
+
+
+    // 1049. 最后一块石头的重量 II
+    int lastStoneWeightII(vector<int>& stones) {
+        int total = accumulate(stones.begin(), stones.end(), 0);
+        int bagSize = total/2;
+        vector<int> dp(bagSize + 1);
+        for(int i = stones[0]; i <= bagSize; i++){
+            dp[i] = stones[0];
+        }
+        for(int i = 1; i < stones.size(); i++){
+            for(int j = bagSize; j > 0; j--){
+                if(j >= stones[i]){
+                    dp[j] = max(dp[j], dp[j-stones[i]] + stones[i]);
+                }
+            }
+        }
+        return total - 2*(*dp.rbegin());
+    }
+
+
+    // 494. 目标和
+    int findTargetSumWays(vector<int>& nums, int target) {
+        unordered_map<int, int> pre;
+        unordered_map<int, int> cur;
+        pre.insert(pair(-nums[0], 1));
+        pre.insert(pair(nums[0], 1));
+        for(int i = 1; i < nums.size(); i++){
+            for(auto it: pre){
+                cur[it.first + nums[i]]++;
+                cur[it.first - nums[i]]++;
+            }
+            pre = cur;
+        }
+        return cur[target];
     }
     
 
