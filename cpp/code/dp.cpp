@@ -7,6 +7,62 @@
 
 using namespace std;
 
+class SolutionKama{
+public:
+
+    // 46. 携带研究材料（第六期模拟笔试）
+    int KaMa_46(){
+        int m, n;
+        cin >> m;
+        cin >> n;
+        vector<int> weight(m);
+        vector<int> value(m);
+        for(int i = 0; i < m; i++){
+            cin >> weight[i];
+        }
+        for(int i = 0; i < m; i++){
+            cin >> value[i];
+        }
+        vector<int> dp(n+1);
+        for(int i = weight[0]; i <= n; i++){
+            dp[i] = value[0];
+        }
+        for(int epoch = 1; epoch < m; epoch++){
+            for(int j = n; j > 0; j--){
+                if(j >= weight[epoch]){
+                    dp[j] = max(dp[j-weight[epoch]]+value[epoch], dp[j]);
+                }
+            }
+        }
+        cout << *dp.rbegin() << endl;
+        return 1;
+    }
+
+    // 52. 携带研究材料（第七期模拟笔试）
+    int kama52(){
+        int m, n;
+        cin >> m;
+        cin >> n;
+        vector<int> weight(m);
+        vector<int> value(m);
+        for(int i = 0; i < m; i++){
+            cin >> weight[i];
+            cin >> value[i];
+        }
+        vector<int> dp(n+1);
+        for(int i = 1; i <= n; i++){
+            dp[i] = value[0]*(i / weight[0]);
+        }
+        for(int i = 1; i < m; i++){
+            for(int j = weight[i]; j <= n; j++){
+                dp[j] = max(dp[j], dp[j-weight[i]]+value[i]);
+            }
+        }
+        cout << dp[n] << endl;
+}
+
+};
+
 class Solution{
 public:
 
@@ -186,79 +242,24 @@ public:
 
     // 474 一和零
     int findMaxForm(vector<string>& strs, int m, int n) {
-        int num0 = 0, num1 = 0;
-        count10(strs[0], num0, num1);
         vector<vector<int>> dp(m+1, vector<int>(n+1, 0));
-        for(int i = num0; i <= m; i++){
-            for(int j = num1; j <= n; j++){
-                dp[i][j] = 1;
+        for(string str: strs){
+            int oneNum = 0, zeroNum = 0;
+            for(char ch: str){
+                if(ch == '1') oneNum++;
+                else zeroNum++;
             }
-        }
-
-        for(int i = 0; i <= n; i++){
-            for(int j = 0; j <= m; j++){
-                cout << dp[j][i] << ' ';
-            }
-            cout << endl;
-        }
-
-        for(int k = 1; k < strs.size(); k++){
-            num0 = 0; 
-            num1 = 0;
-            count10(strs[k], num0, num1);
-            for(int i = n; i >= 0; i--){
-                for(int j = m; j >= 0; j--){
-                    if(i >= num1 && j >= num0){
-                        dp[j][i] = max(dp[j][i], dp[j - num0][i-num1]+1);
-                    }
+            for(int i = m; i >= zeroNum; i--){
+                for(int j = n; j >= oneNum; j--){
+                    dp[i][j] = max(dp[i][j], dp[i-zeroNum][j-oneNum]+1);
                 }
-                for(int u = 0; u <= n; u++){
-                    for(int v = 0; v <= m; v++){
-                        cout << dp[v][u] << ' ';
-                    }
-                    cout << endl;
-        }
-            } 
+            }
         }
         return dp[m][n];
     }
 
-    void count10(string s, int& m, int& n){
-        for(char ch: s){
-            if(ch == '0') m++;
-            else n++;
-        }
-    }
-
 };
 
-// 46. 携带研究材料（第六期模拟笔试）
-int KaMa_46(){
-    int m, n;
-    cin >> m;
-    cin >> n;
-    vector<int> weight(m);
-    vector<int> value(m);
-    for(int i = 0; i < m; i++){
-        cin >> weight[i];
-    }
-    for(int i = 0; i < m; i++){
-        cin >> value[i];
-    }
-    vector<int> dp(n+1);
-    for(int i = weight[0]; i <= n; i++){
-        dp[i] = value[0];
-    }
-    for(int epoch = 1; epoch < m; epoch++){
-        for(int j = n; j > 0; j--){
-            if(j >= weight[epoch]){
-                dp[j] = max(dp[j-weight[epoch]]+value[epoch], dp[j]);
-            }
-        }
-    }
-    cout << *dp.rbegin() << endl;
-    return 1;
-}
 
 int main(){
     Solution s;
