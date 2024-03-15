@@ -179,7 +179,6 @@ public:
         }
         return res;
     }
-    unordered_map<string, string> a;
 };
 
 int main(){

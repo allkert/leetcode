@@ -3,6 +3,7 @@
 # include<numeric>
 # include<string>
 #include <unordered_map>
+#include <map>
 
 using namespace std;
 
@@ -149,18 +150,85 @@ public:
     int findTargetSumWays(vector<int>& nums, int target) {
         unordered_map<int, int> pre;
         unordered_map<int, int> cur;
-        pre.insert(pair(-nums[0], 1));
-        pre.insert(pair(nums[0], 1));
+        pre[nums[0]]++;
+        pre[-nums[0]]++;
         for(int i = 1; i < nums.size(); i++){
             for(auto it: pre){
-                cur[it.first + nums[i]]++;
-                cur[it.first - nums[i]]++;
+                cur[it.first + nums[i]] += it.second;
+                cur[it.first - nums[i]] += it.second;
             }
-            pre = cur;
+            swap(cur, pre);
+            cur.clear();
         }
-        return cur[target];
+        return pre[target];
     }
-    
+
+    // 背包问题的思路
+    int findTargetSumWaysBagSolution(vector<int>& nums, int target){
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if((sum + target) % 2 != 0) return 0;
+        if(abs(target) > sum) return 0;
+        int bagSize = (sum + target)/2;
+        vector<int> dp(bagSize + 1);
+        dp[0] = 1;
+        if(nums[0] <= bagSize){
+            dp[nums[0]]++;
+        }
+        for(int i = 1; i < nums.size(); i++){
+            for(int j = bagSize; j >= 0; j--){
+                if(j >= nums[i]){
+                    dp[j] += dp[j - nums[i]];
+                }
+            }
+        }
+        return *dp.rbegin();
+    }
+
+    // 474 一和零
+    int findMaxForm(vector<string>& strs, int m, int n) {
+        int num0 = 0, num1 = 0;
+        count10(strs[0], num0, num1);
+        vector<vector<int>> dp(m+1, vector<int>(n+1, 0));
+        for(int i = num0; i <= m; i++){
+            for(int j = num1; j <= n; j++){
+                dp[i][j] = 1;
+            }
+        }
+
+        for(int i = 0; i <= n; i++){
+            for(int j = 0; j <= m; j++){
+                cout << dp[j][i] << ' ';
+            }
+            cout << endl;
+        }
+
+        for(int k = 1; k < strs.size(); k++){
+            num0 = 0; 
+            num1 = 0;
+            count10(strs[k], num0, num1);
+            for(int i = n; i >= 0; i--){
+                for(int j = m; j >= 0; j--){
+                    if(i >= num1 && j >= num0){
+                        dp[j][i] = max(dp[j][i], dp[j - num0][i-num1]+1);
+                    }
+                }
+                for(int u = 0; u <= n; u++){
+                    for(int v = 0; v <= m; v++){
+                        cout << dp[v][u] << ' ';
+                    }
+                    cout << endl;
+        }
+            } 
+        }
+        return dp[m][n];
+    }
+
+    void count10(string s, int& m, int& n){
+        for(char ch: s){
+            if(ch == '0') m++;
+            else n++;
+        }
+    }
 
 };
 
@@ -189,12 +257,14 @@ int KaMa_46(){
         }
     }
     cout << *dp.rbegin() << endl;
+    return 1;
 }
 
 int main(){
-    int m;
-    int n;
-    cin >> m;
-    cin >> n;
-    cout << m<<endl;
+    Solution s;
+    vector<string> a{"10","0001","111001","1","0"};
+    int m = 5; 
+    int n = 3;
+    cout << s.findMaxForm(a, m, n);
+
 }
