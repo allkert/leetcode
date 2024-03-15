@@ -59,7 +59,22 @@ public:
             }
         }
         cout << dp[n] << endl;
-}
+        return 1;
+    }
+
+    int kama57(){
+        int n, m;
+        cin >> n;
+        cin >> m;
+        vector<int> dp(n+1);
+        dp[0] = 1;
+        for(int i = 0; i <= n; i++){
+            for(int j = 1; j <= m; j++){
+                if(j <= i) dp[i] += dp[i-j];
+            }
+        }
+        cout << dp[n] << endl;
+    }
 
 };
 
@@ -258,14 +273,53 @@ public:
         return dp[m][n];
     }
 
+    // 518. 零钱兑换 II
+    int change(int amount, vector<int>& coins) {
+        vector<int> dp(amount+1);
+        dp[0] = 1;
+        for(int i = 0; i < coins.size(); i++){
+            for(int j = coins[i]; j <= amount; j++){
+                dp[j] += dp[j-coins[i]];
+            }
+        }
+        return dp[amount];
+    }
+
+
+    // 377 组合总和Ⅳ 
+    int combinationSum4(vector<int>& nums, int target) {
+        vector<int> dp(target + 1, 0);
+        dp[0] = 1;
+        for (int i = 0; i <= target; i++) { // 遍历背包
+            for (int j = 0; j < nums.size(); j++) { // 遍历物品
+                if (i - nums[j] >= 0 && dp[i] < INT_MAX - dp[i - nums[j]]) {
+                    dp[i] += dp[i - nums[j]];
+                }
+            }
+        }
+        return dp[target];
+    }
+
+    // 322. 零钱兑换
+    int coinChange(vector<int>& coins, int amount) {
+        vector<int> dp(amount + 1, INT_MAX);
+        dp[0] = 0;
+        for(int i = 0; i < coins.size(); i++){
+            for(int j = coins[i]; j <= amount; j++){
+                if(dp[j-coins[i]] != INT_MAX){
+                    dp[j] = min(dp[j], dp[j-coins[i]]+1);
+                }
+            }
+        }
+        return (dp[amount] == INT_MAX)? -1:dp[amount];
+    }
+
 };
 
 
 int main(){
     Solution s;
-    vector<string> a{"10","0001","111001","1","0"};
-    int m = 5; 
-    int n = 3;
-    cout << s.findMaxForm(a, m, n);
-
+    vector<int> nums{1,2,3};
+    int target = 4;
+    cout << s.combinationSum4(nums, target);
 }
