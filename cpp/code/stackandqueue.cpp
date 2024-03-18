@@ -288,7 +288,7 @@ public:
                 count[num]++;
             }
             priority_queue<pair<int, int>, vector<pair<int, int>>, mycomparison> pri_que;
-            for(unordered_map<int, int>::iterator it = count.begin();it < count.end();it++){
+            for(unordered_map<int, int>::iterator it = count.begin();it != count.end();it++){
                 pri_que.push(*it);
                 if(pri_que.size() > k){
                     pri_que.pop();
