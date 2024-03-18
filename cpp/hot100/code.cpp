@@ -67,7 +67,7 @@ public:
             int current = start;
             int prev = nums[start];
             do{
-                int next = (current + k) % n;
+                int next = (current + k) % nums.size();
                 swap(nums[next], prev);
                 current = next;
             }while(start != current);
@@ -90,6 +90,6 @@ public:
 
     // 41. 缺失的第一个正数
     int firstMissingPositive(vector<int>& nums) {
-        
+
     }
 };
