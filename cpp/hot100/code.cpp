@@ -6,6 +6,14 @@
 
 using namespace std;
 
+    // Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {};
+};
+
+
 class Solution{
 public:
 
@@ -228,6 +236,138 @@ public:
         }
     }
 
+
+    // 240. 搜索二维矩阵 II
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m = matrix.size(), n = matrix[0].size();
+        int colLeft = 0, colRight = n - 1;
+        int rowLeft = 0, rowRight = m - 1;
+        while(colLeft <= colRight){
+            int mid = (colRight + colLeft) / 2;
+            if(matrix[mid][n-1] == target) return true;
+            else if(matrix[mid][n-1] < target) colLeft = mid + 1;
+            else colRight = mid - 1;
+        }
+        while(rowLeft <= rowRight){
+            int mid = (rowLeft + rowRight)/2;
+            if(matrix[m-1][mid] == target) return true;
+            else if(matrix[m-1][mid] > target) rowRight = mid - 1;
+            else rowLeft = mid + 1;
+        }
+        for(int i = colRight + 1; i < m; i++){
+            for(int j = rowRight + 1; j < n; j++){
+                if(matrix[i][j] == target) return true;
+            }
+        }
+        return false;
+    }
+
+    bool searchMatrix1(vector<vector<int>>& matrix, int target){
+        int m = matrix.size(), n = matrix[0].size();
+        int x = 0, y = n - 1;
+        while(x < m && y >= 0){
+            if(matrix[x][y] == target) return true;
+            else if(matrix[x][y] > target) y--;
+            else x++;
+        }
+        return false;
+    }
+
+    // 160. 相交链表
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(headA == nullptr || headB == nullptr) return NULL;
+        int lenA = 0, lenB = 0;
+        ListNode* curA = headA, *curB = headB;
+        while(curA != NULL){
+            lenA++;
+            curA = curA->next;
+        }
+        while(curB != NULL){
+            lenB++;
+            curB = curB->next;
+        }
+        curA = headA; curB = headB;
+        if(lenA < lenB){
+            swap(curA, curB);
+            swap(lenA, lenB);
+        }
+        int i = 0;
+        while(i < lenA - lenB){
+            curA = curA->next;
+            i++;
+        }
+        while(curA != NULL && curB != NULL){
+            if(curA == curB) return curA;
+            curA = curA->next;
+            curB = curB->next;
+        }
+        return NULL;
+    }
+
+    // 234. 回文链表
+    bool isPalindrome(ListNode* head) {
+        if(head == NULL) return true;
+        int length = 1;
+        ListNode* tail = head, *cur = head;
+        while(tail->next != NULL){
+            length++;
+            tail = tail->next;
+        }
+        for(int i = 0; i < length/2; i++) cur = cur->next;
+        ListNode* pre = cur;
+        cur = cur->next;
+        pre->next = NULL;
+        while(cur != NULL){
+            ListNode* tmp = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = tmp;
+        }
+        cur = head;
+        while(tail != NULL){
+            if(cur->val != tail->val) return false;
+            cur = cur->next; tail = tail->next;
+        }
+        return true;
+    }
+
+    // 141. 环形链表
+    bool hasCycle(ListNode *head) {
+        if(head == NULL) return false;
+        ListNode *low = head, *fast = head;
+        while(fast->next != NULL && fast->next->next !=NULL){
+            low = low->next;
+            fast = fast->next->next;
+            if(low == fast) return true;
+        }
+        return false;
+    }
+
+    // 21. 合并两个有序链表
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if(list1 == NULL) return list2;
+        if(list2 == NULL) return list1;
+        if(list1->val > list2->val) swap(list1, list2);
+        ListNode* cur1 = list1->next, *pre = list1;
+        ListNode* cur2 = list2;
+        while(cur1 != NULL && cur2 != NULL){
+            if(cur2->val >= pre->val && cur2->val <= cur1->val){
+                ListNode* tmp = cur2->next;
+                pre->next = cur2;
+                cur2->next = cur1;
+                pre = cur2;
+                cur2 = tmp;
+            }
+            else{
+                pre = pre->next;
+                cur1 = cur1->next;
+            }
+        }
+        return list1;
+    }
+
+
+
 private:
     int gcd(int a, int b) {
         while (b != 0) {
@@ -237,6 +377,7 @@ private:
         }
         return a;
     }
+
 
 };
 
