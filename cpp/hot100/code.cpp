@@ -103,4 +103,9 @@ public:
         }
         return nums.size()+1;
     }
+
+    // 73. 矩阵置零
+    void setZeroes(vector<vector<int>>& matrix) {
+        
+    }
 };
