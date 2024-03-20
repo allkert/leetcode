@@ -3,6 +3,8 @@
 #include<numeric>
 #include<algorithm>
 #include <map>
+#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -13,6 +15,19 @@ struct ListNode {
     ListNode(int x) : val(x), next(NULL) {};
 };
 
+
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
 
 class Solution{
 public:
@@ -409,6 +424,81 @@ public:
         }
         return res;
     }
+
+    // 138. 随机链表的复制
+    Node* copyRandomList(Node* head) {
+        if(head == NULL) return nullptr;
+        unordered_map<Node*, Node*> unmap;
+        Node* cur = head;
+        while(cur != NULL){
+            unordered_map<Node*, Node*>:: iterator it = unmap.find(cur);
+            Node* node = nullptr;
+            if(it != unmap.end()){
+                node = it->second;
+            }
+            else{
+                node = new Node(cur->val);
+                unmap.insert(pair(cur, node));
+            }
+
+            if(cur->random != NULL){
+                Node* randomNode = nullptr;
+                it = unmap.find(cur->random);
+                if(it != unmap.end()){
+                    randomNode = it->second;
+                }
+                else{
+                    randomNode = new Node(cur->random->val);
+                    unmap.insert(pair(cur->random, randomNode));
+                }
+                node->random = randomNode;
+            }
+
+            if(cur->next != NULL){
+                it = unmap.find(cur->next);
+                if(it != unmap.end()){
+                    node->next =it->second;
+                }
+                else{
+                    node->next = new Node(cur->next->val);
+                    unmap.insert(pair(cur->next, node->next));
+                }
+            }
+            cur = cur->next;
+        }
+        return unmap.find(head)->second;
+    }
+
+
+    // 148. 排序链表
+    ListNode* sortList(ListNode* head){
+        int length = 0;
+        ListNode* cur = head;
+        while(cur){
+            cur = cur->next;
+            length++;
+        }
+        return sortList_Traversal(head, length);
+    }
+    ListNode* sortList_Traversal(ListNode* head, int k){
+        if(k == 2){
+            if(head->val > head->next->val){
+                swap(head->val, head->next->val);
+            }
+            return head;
+        }
+        else if(k >= 3){
+            int mid = k / 2;
+            ListNode* rightHead = head;
+            for(int i = 0; i < mid; i++) rightHead = rightHead->next;
+            sortList_Traversal(head, mid);
+            sortList_Traversal(rightHead, k - mid);
+            return mergeTwoLists(head, rightHead);
+        }
+        return head;
+    }
+
+
 
 
 
