@@ -344,7 +344,7 @@ public:
     }
 
     // 21. 合并两个有序链表
-    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+    ListNode* mergeTwoLists_it(ListNode* list1, ListNode* list2) {
         if(list1 == NULL) return list2;
         if(list2 == NULL) return list1;
         if(list1->val > list2->val) swap(list1, list2);
@@ -366,6 +366,50 @@ public:
         return list1;
     }
 
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2){
+        if(list1 == NULL) return list2;
+        else if(list2 == NULL) return list1;
+        else if(list1->val < list2->val){
+            list1->next = mergeTwoLists(list1->next, list2);
+            return list1;
+        }
+        else{
+            list2->next = mergeTwoLists(list2->next, list1);
+            return list2;
+        }
+    }
+
+    // 25. K 个一组翻转链表
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode* beginPtr = head, *endPtr = head;
+        for(int i = 0; i < k - 1; i++){
+            if(endPtr == NULL) return head;
+            endPtr = endPtr->next; 
+        }
+        ListNode* res = endPtr;
+        while(endPtr){
+            ListNode *pre = beginPtr, *cur = beginPtr->next, *tmp;
+            for(int i = 0; i < k - 1; i++){
+                tmp = cur->next;
+                cur->next = pre;
+                pre = cur;
+                cur = tmp;
+            }
+            ListNode* preTail = beginPtr;
+            if(cur == NULL) return res;
+            endPtr = beginPtr = cur;
+            for(int i = 0; i < k-1; i++){
+                endPtr = endPtr->next;
+                if(endPtr == NULL){
+                    preTail->next = beginPtr;
+                    return res;
+                }
+            }
+            preTail->next = endPtr;
+        }
+        return res;
+    }
+
 
 
 private:
@@ -383,12 +427,18 @@ private:
 
 int main(){
     Solution s;
-    vector<vector<int>> matrix{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
-    s.rotate(matrix);
-    for(int i = 0; i < 4; i++){
-        for(int j = 0; j < 4; j++){
-            cout << matrix[i][j] << ' ';
-        }
-        cout <<"---------------";
+    ListNode* head = new ListNode(1);
+    ListNode* node1 = new ListNode(2);
+    ListNode* node2 = new ListNode(3);
+    ListNode* node3 = new ListNode(4);
+    ListNode* node4 = new ListNode(5);
+    head->next = node1;
+    node1->next = node2;
+    node2->next = node3;
+    node3->next = node4;
+    ListNode* node = s.reverseKGroup(head, 2);
+    while(node){
+        cout << node->val;
+        node = node->next;
     }
 }
