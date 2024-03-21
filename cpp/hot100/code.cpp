@@ -498,14 +498,22 @@ public:
                 rightHead = rightHead->next;
             }
             pre->next = NULL;
-            sortList_Traversal(head, mid);
-            sortList_Traversal(rightHead, k - mid);
-
-            cout << head->val << rightHead->val<<endl;
-            cout << rightHead->val << rightHead->next->val << rightHead->next->next->val;
-            return mergeTwoLists(head, rightHead);
+            head = sortList_Traversal(head, mid);
+            rightHead = sortList_Traversal(rightHead, k - mid);
+            ListNode* res  = mergeTwoLists(head, rightHead);
+            return res;
         }
         return head;
+    }
+
+
+    // 23. 合并 K 个升序链表
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        ListNode* res = NULL;
+        for(ListNode* head : lists){
+            res = mergeTwoLists(res, head);
+        }
+        return res;
     }
 
 

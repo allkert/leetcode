@@ -1,4 +1,2 @@
-            // while(t){
-            //     cout << t->val << ' ';
-            //     t = t->next;
-            // }
+
+    head->next = node1;
