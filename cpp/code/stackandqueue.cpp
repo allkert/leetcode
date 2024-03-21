@@ -281,28 +281,29 @@ public:
             return l.second > h.second;
         }
     };
-        vector<int> topKFrequent(vector<int>& nums, int k) {
-            unordered_map<int, int> count;
-            // 统计频率
-            for(int num: nums){
-                count[num]++;
-            }
-            priority_queue<pair<int, int>, vector<pair<int, int>>, mycomparison> pri_que;
-            for(unordered_map<int, int>::iterator it = count.begin();it != count.end();it++){
-                pri_que.push(*it);
-                if(pri_que.size() > k){
-                    pri_que.pop();
-                }
-            }
-
-            vector<int> res;
-            for(int i = 0; i < k; i++){
-                res.push_back(pri_que.top().first);
+    
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> count;
+        // 统计频率
+        for(int num: nums){
+            count[num]++;
+        }
+        priority_queue<pair<int, int>, vector<pair<int, int>>, mycomparison> pri_que;
+        for(unordered_map<int, int>::iterator it = count.begin();it != count.end();it++){
+            pri_que.push(*it);
+            if(pri_que.size() > k){
                 pri_que.pop();
             }
-
-            return res;
         }
+
+        vector<int> res;
+        for(int i = 0; i < k; i++){
+            res.push_back(pri_que.top().first);
+            pri_que.pop();
+        }
+
+        return res;
+    }
 
 
     class MyOrderedQueue{

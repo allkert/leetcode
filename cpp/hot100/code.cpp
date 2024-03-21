@@ -2,9 +2,10 @@
 #include<vector>
 #include<numeric>
 #include<algorithm>
-#include <map>
-#include <unordered_set>
-#include <unordered_map>
+#include<map>
+#include<unordered_set>
+#include<unordered_map>
+#include<queue>
 
 using namespace std;
 
@@ -508,13 +509,55 @@ public:
 
 
     // 23. 合并 K 个升序链表
-    ListNode* mergeKLists(vector<ListNode*>& lists) {
+    // 最笨的办法，一个一个合并
+    ListNode* mergeKLists_1(vector<ListNode*>& lists) {
         ListNode* res = NULL;
         for(ListNode* head : lists){
             res = mergeTwoLists(res, head);
         }
         return res;
     }
+
+    // 两两合并
+    ListNode* mergeKLists_2(vector<ListNode*>& lists){
+        return mergeKL(lists, 0, lists.size()-1);
+    }
+
+    ListNode* mergeKL(vector<ListNode*>& lists, int listBegin, int listEnd){
+        if(listBegin == listEnd) return lists[listBegin];
+        else if(listBegin > listEnd) return NULL;
+        else{
+            int mid = (listBegin + listEnd) / 2;
+            return mergeTwoLists(mergeKL(lists, listBegin, mid), mergeKL(lists, mid+1, listEnd));
+        }
+    }
+
+    // 优先级队列
+    class cmp{
+    public:
+        bool operator()(ListNode*& a, ListNode*& b){
+            return (a->val > b->val);
+        }
+    };
+
+
+
+    ListNode* mergeKLists(vector<ListNode*>& lists){
+        priority_queue<ListNode*, vector<ListNode*>, cmp> prique;
+        for(int i = 0; i < lists.size(); i++){
+            if(lists[i] != NULL) prique.push(lists[i]);
+        }
+        return mergeKLists_pri(prique);
+    }
+
+    ListNode* mergeKLists_pri(priority_queue<ListNode*, vector<ListNode*>, cmp>& prique){
+        if(prique.empty()) return NULL;
+        ListNode* node = prique.top(); prique.pop();
+        if(node->next) prique.push(node->next);
+        node->next = mergeKLists_pri(prique);
+        return node;
+    }
+
 
 
 
@@ -529,24 +572,106 @@ private:
         }
         return a;
     }
+};
 
+// 146. LRU 缓存
+struct DLinkedNode{
+    int key, value;
+    DLinkedNode* prev, *next;
+    DLinkedNode():key(0), value(0), prev(NULL), next(NULL){}
+    DLinkedNode(int _key, int _value) : key(_key), value(_value), prev(NULL), next(NULL) {}
+};
+
+class LRUCache{
+private:
+    unordered_map<int, DLinkedNode*> cache;
+    DLinkedNode* head, *tail;
+    int size, capacity;
+public:
+    LRUCache(int _capacity) : capacity(_capacity), size(0) {
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    int get(int key){
+        if(cache.find(key) == cache.end()) return -1;
+        DLinkedNode* node = cache[key];
+        moveToHead(node);
+        return node->value;
+    }
+
+    void put(int key, int value){
+        if(cache.find(key) != cache.end()){
+            DLinkedNode* node = cache[key];
+            node->value = value;
+            moveToHead(node);
+        }
+        else{
+            DLinkedNode* node = new DLinkedNode(key, value);
+            // 放入到cache中
+            cache[key] = node;
+            // 放到表头
+            addToHead(node);
+            size++;
+            // 处理超出cache容量的情况
+            if(size > capacity){
+                size--;
+                DLinkedNode* removed = removeTail();
+                cache.erase(removed->key);
+                delete removed;
+            }
+        }
+    }
+
+    void moveToHead(DLinkedNode* node){
+        removeNode(node);
+        addToHead(node);
+    }
+
+    void removeNode(DLinkedNode* node){
+        // 注意此时这个节点还在cache中
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    void addToHead(DLinkedNode* node){
+        node->prev = head;
+        node->next = head->next;
+        head->next = node;
+        node->next->prev = node;
+    }
+
+    DLinkedNode* removeTail(){
+        DLinkedNode* node = tail->prev;
+        removeNode(node);
+        return node;
+    }
 
 };
 
+
+
 int main(){
-    Solution s;
-    ListNode* head = new ListNode(0);
-    ListNode* node1 = new ListNode(5);
-    ListNode* node2 = new ListNode(3);
-    ListNode* node3 = new ListNode(1);
-    ListNode* node4 = new ListNode(4);
-    head->next = node1;
-    node1->next = node2;
-    node2->next = node3;
-    node3->next = node4;
-    ListNode* node = s.sortList(head);
-    while(node){
-        cout << node->val;
-        node = node->next;
-    }
+    // Solution s;
+    // ListNode* head = new ListNode(0);
+    // ListNode* node1 = new ListNode(5);
+    // ListNode* node2 = new ListNode(3);
+    // ListNode* node3 = new ListNode(1);
+    // ListNode* node4 = new ListNode(4);
+    // head->next = node1;
+    // node1->next = node2;
+    // node2->next = node3;
+    // node3->next = node4;
+    // ListNode* node = s.sortList(head);
+    // while(node){
+    //     cout << node->val;
+    //     node = node->next;
+    // }
+    // priority_queue<pair<int, int>, vector<pair<int, int>>, cmp> prque;
+    // prque.push(pair<int, int>(1, 2));
+    // prque.push(pair<int, int>(2, 3));
+    // cout << prque.top().second;
 }
+
