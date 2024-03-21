@@ -6,16 +6,26 @@
 #include<unordered_set>
 #include<unordered_map>
 #include<queue>
+#include <stack>
 
 using namespace std;
 
-    // Definition for singly-linked list.
+// Definition for singly-linked list.
 struct ListNode {
     int val;
     ListNode *next;
     ListNode(int x) : val(x), next(NULL) {};
 };
 
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right)
+        : val(x), left(left), right(right) {}
+};
 
 class Node {
 public:
@@ -556,6 +566,46 @@ public:
         if(node->next) prique.push(node->next);
         node->next = mergeKLists_pri(prique);
         return node;
+    }
+
+    // 543. 二叉树的直径
+    int diameterOfBinaryTree(TreeNode* root) {
+        int res = 0;
+        diameterOfBinaryTreeRecursion(root, res);
+        return res;
+    }
+
+    int diameterOfBinaryTreeRecursion(TreeNode* root, int& res){
+        if(root == nullptr) return 0;
+        int leftDepth = diameterOfBinaryTreeRecursion(root->left, res) + 1;
+        int rightDepth = diameterOfBinaryTreeRecursion(root->right, res) + 1;
+        if(leftDepth + rightDepth - 2 > res) res = leftDepth + rightDepth - 2;
+        return max(leftDepth, rightDepth);
+    }
+
+    // 230. 二叉搜索树中第K小的元素
+    int kthSmallest(TreeNode* root, int k) {
+        int count = 0;
+        stack<TreeNode*> st;
+        TreeNode* cur = root;
+        while(!st.empty() || cur != NULL){
+            if(cur == NULL){
+                cur = st.top(); st.pop();
+                count++;
+                if(count == k) return cur->val;
+                cur = cur->right;
+            }
+            else{
+                st.push(cur);
+                cur = cur->left;
+            }
+        }
+        return 0;
+    }
+
+    // 114. 二叉树展开为链表
+    void flatten(TreeNode* root) {
+
     }
 
 
