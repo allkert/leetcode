@@ -438,7 +438,7 @@ public:
             }
             else{
                 node = new Node(cur->val);
-                unmap.insert(pair(cur, node));
+                unmap.insert(pair<Node*, Node*>(cur, node));
             }
 
             if(cur->random != NULL){
@@ -449,7 +449,7 @@ public:
                 }
                 else{
                     randomNode = new Node(cur->random->val);
-                    unmap.insert(pair(cur->random, randomNode));
+                    unmap.insert(pair<Node*, Node*>(cur->random, randomNode));
                 }
                 node->random = randomNode;
             }
@@ -461,7 +461,7 @@ public:
                 }
                 else{
                     node->next = new Node(cur->next->val);
-                    unmap.insert(pair(cur->next, node->next));
+                    unmap.insert(pair<Node*, Node*>(cur->next, node->next));
                 }
             }
             cur = cur->next;
@@ -483,16 +483,26 @@ public:
     ListNode* sortList_Traversal(ListNode* head, int k){
         if(k == 2){
             if(head->val > head->next->val){
-                swap(head->val, head->next->val);
+                // cout << head->val << head->next->val;
+                int tmp = head->val;
+                head->val = head->next->val;
+                head->next->val = tmp;
             }
             return head;
         }
         else if(k >= 3){
             int mid = k / 2;
-            ListNode* rightHead = head;
-            for(int i = 0; i < mid; i++) rightHead = rightHead->next;
+            ListNode* rightHead = head, *pre = nullptr;
+            for(int i = 0; i < mid; i++){
+                pre = rightHead;
+                rightHead = rightHead->next;
+            }
+            pre->next = NULL;
             sortList_Traversal(head, mid);
             sortList_Traversal(rightHead, k - mid);
+
+            cout << head->val << rightHead->val<<endl;
+            cout << rightHead->val << rightHead->next->val << rightHead->next->next->val;
             return mergeTwoLists(head, rightHead);
         }
         return head;
@@ -517,16 +527,16 @@ private:
 
 int main(){
     Solution s;
-    ListNode* head = new ListNode(1);
-    ListNode* node1 = new ListNode(2);
+    ListNode* head = new ListNode(0);
+    ListNode* node1 = new ListNode(5);
     ListNode* node2 = new ListNode(3);
-    ListNode* node3 = new ListNode(4);
-    ListNode* node4 = new ListNode(5);
+    ListNode* node3 = new ListNode(1);
+    ListNode* node4 = new ListNode(4);
     head->next = node1;
     node1->next = node2;
     node2->next = node3;
     node3->next = node4;
-    ListNode* node = s.reverseKGroup(head, 2);
+    ListNode* node = s.sortList(head);
     while(node){
         cout << node->val;
         node = node->next;
