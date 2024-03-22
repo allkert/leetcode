@@ -604,9 +604,75 @@ public:
     }
 
     // 114. 二叉树展开为链表
-    void flatten(TreeNode* root) {
-
+    // 前序遍历，但是空间复杂度不是o(1)
+    void flatten_it_preorder(TreeNode* root) {
+        if(root == NULL) return;
+        stack<TreeNode*> st;
+        st.push(root);
+        TreeNode* prev = NULL;
+        while(!st.empty()){
+            TreeNode* node = st.top();st.pop();
+            if(prev){
+                prev->right = node;
+                prev->left = NULL;
+            }
+            if(node->right) st.push(node->right);
+            if(node->left) st.push(node->left);
+            prev = node; 
+        }
     }
+
+    // 递归
+    // 空间复杂度也不是o(1)
+    void flatten_recursion(TreeNode* root){
+        if(root == NULL) return;
+        flatten_recursion(root->right);
+        flatten_recursion(root->left);
+        root->left = NULL;
+        root->right = preNode114;
+        preNode114 = root;
+    }
+
+    // 空间复杂度o(1)的方法：将右子树挪到左子树的最右节点。
+    void flatten(TreeNode* root){
+        TreeNode* curr = root;
+        while(curr != NULL){
+            if(curr->left != NULL){
+                auto next = curr->left;
+                auto predecessor = next;
+                while(predecessor->right != NULL){
+                    predecessor = predecessor->right;
+                }
+                predecessor->right = curr->right;
+                curr->left = nullptr;
+                curr->right = next;
+            }
+            curr = curr->right;
+        }
+    }
+
+    int dfs(TreeNode *root, long long curr, int targetSum){
+        if(root == NULL) return 0;
+        int ret = 0;
+        // 到当前节点的前缀和
+        curr += root->val;
+        if(prefix437.count(curr - targetSum)){
+            ret = prefix437[curr - targetSum];
+        }
+        prefix437[curr]++;
+        ret += dfs(root->left, curr, targetSum);
+        ret += dfs(root->right, curr, targetSum);
+        prefix437[curr]--;
+        return ret;
+    }
+        int pathSum(TreeNode* root, int targetSum) {
+        prefix437[0] = 1;
+        return dfs(root, 0, targetSum);
+    }
+
+
+
+    
 
 
 
@@ -622,6 +688,9 @@ private:
         }
         return a;
     }
+
+    TreeNode* preNode114;
+    unordered_map<long long, int> prefix437;
 };
 
 // 146. LRU 缓存
