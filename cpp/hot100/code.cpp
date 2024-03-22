@@ -651,6 +651,8 @@ public:
         }
     }
 
+    // 437. 路径总和 III
+    // 递归回溯！！！！背吧！
     int dfs(TreeNode *root, long long curr, int targetSum){
         if(root == NULL) return 0;
         int ret = 0;
@@ -670,6 +672,39 @@ public:
         return dfs(root, 0, targetSum);
     }
 
+    // 124. 二叉树中的最大路径和
+    int maxPathSum(TreeNode* root) {
+        if(root == NULL) return 0;
+        unordered_map<TreeNode*, vector<int>> dp;
+        dp.insert({NULL, {INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}});
+        int res = INT_MIN;
+        maxPathSum_Recursion(root, dp, res);
+        return res;
+    }
+
+    void maxPathSum_Recursion(TreeNode* root, unordered_map<TreeNode*, vector<int>>& dp, int& res){
+        if(root == NULL) return;
+        maxPathSum_Recursion(root->left, dp, res);
+        maxPathSum_Recursion(root->right, dp, res);
+        vector<int> cur(4, 0);
+        vector<int> left = dp[root->left];
+        vector<int> right = dp[root->right];
+        cur[1] = root->val + max(max(left[1], left[2]), left[3]);
+        cur[2] = root->val + max(max(right[1], right[2]), right[3]);
+        cur[0] = max(cur[1], cur[2]) - root->val;
+        cur[3] = root->val;
+        dp.insert({root, cur});
+        res = max(res, findMax(cur));
+
+    }
+
+    int findMax(vector<int> nums){
+        int res = INT_MIN;
+        for(int num: nums){
+            if(num > res) res = num;
+        }
+        return max(res, nums[1] + nums[2] - nums[3]);
+    }
 
 
     
