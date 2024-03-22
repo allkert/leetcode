@@ -7,6 +7,7 @@
 #include<unordered_map>
 #include<queue>
 #include <stack>
+#include <intrin.h>
 
 using namespace std;
 
@@ -673,7 +674,7 @@ public:
     }
 
     // 124. 二叉树中的最大路径和
-    int maxPathSum(TreeNode* root) {
+    int maxPathSum_1(TreeNode* root) {
         if(root == NULL) return 0;
         unordered_map<TreeNode*, vector<int>> dp;
         dp.insert({NULL, {INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}});
@@ -704,6 +705,25 @@ public:
             if(num > res) res = num;
         }
         return max(res, nums[1] + nums[2] - nums[3]);
+    }
+
+    // 参考答案
+    int maxPathSum(TreeNode* root) {
+        if(root == NULL) return 0;
+        int res = INT_MIN;
+        maxGain(root, res);
+        return res;
+    }
+
+    int maxGain(TreeNode* node, int& res){
+        if(node == NULL) return 0;
+
+        int leftGain = max(maxGain(node->left, res), 0);
+        int rightGain = max(maxGain(node->right, res), 0);
+
+        int curPath = node->val + leftGain + rightGain;
+        res = max(res, curPath);
+        return node->val + max(leftGain, rightGain);
     }
 
 
@@ -805,6 +825,42 @@ public:
 
 };
 
+// class Solution_994{
+// private:
+//     int cnt;
+//     // dis用来记时间
+//     int dis[10][10];
+//     int dir_x[4]={0, 1, 0, -1};
+//     int dir_y[4]={1, 0, -1, 0};
+// public:
+//     int orangesRotting(vector<vector<int>>& grid){
+//         queue<pair<int, int>> Q;
+//         // 所有位置设为-1
+//         memset(dis, -1, sizeof(dis));
+//         cnt = 0;
+//         int m = grid[0].size(), n = grid.size(), ans = 0;
+//         for(int i = 0; i < n; i++){
+//             for(int j = 0; j < m; j++){
+//                 if(grid[i][j] == 2){
+//                     Q.push(make_pair(i, j));
+//                     dis[i][j] = 0;
+//                 }
+//                 else if(grid[i][j] == 1) cnt += 1;
+//             }
+//         }
+
+//         while(!Q.empty()){
+//             pair<int, int> x = Q.front(); Q.pop();
+//             for(int i = 0; i < 4; i++){
+//                 int tx = x.first + dir_x[i];
+//                 int ty = x.second + dir_y[i];
+//                 // 判断是否出界, 或者已经访问过， 或者为空地
+//                 if(tx < 0 || tx >= n || ty < 0 || ty >= m || dis[tx][ty] == 0 || grid[tx][ty] == 0) continue;
+//                 dis[tx][ty] = dis[x.first][x.second] + 1;
+//             }
+//         }
+//     }
+// };
 
 
 int main(){
@@ -827,5 +883,7 @@ int main(){
     // prque.push(pair<int, int>(1, 2));
     // prque.push(pair<int, int>(2, 3));
     // cout << prque.top().second;
+    int a = -1;
+    cout << ~a;
 }
 
