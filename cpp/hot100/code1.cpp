@@ -726,13 +726,7 @@ public:
         return node->val + max(leftGain, rightGain);
     }
 
-
     
-
-
-
-
-
 
 private:
     int gcd(int a, int b) {
@@ -825,42 +819,190 @@ public:
 
 };
 
-// class Solution_994{
-// private:
-//     int cnt;
-//     // dis用来记时间
-//     int dis[10][10];
-//     int dir_x[4]={0, 1, 0, -1};
-//     int dir_y[4]={1, 0, -1, 0};
-// public:
-//     int orangesRotting(vector<vector<int>>& grid){
-//         queue<pair<int, int>> Q;
-//         // 所有位置设为-1
-//         memset(dis, -1, sizeof(dis));
-//         cnt = 0;
-//         int m = grid[0].size(), n = grid.size(), ans = 0;
-//         for(int i = 0; i < n; i++){
-//             for(int j = 0; j < m; j++){
-//                 if(grid[i][j] == 2){
-//                     Q.push(make_pair(i, j));
-//                     dis[i][j] = 0;
-//                 }
-//                 else if(grid[i][j] == 1) cnt += 1;
-//             }
-//         }
+class Solution_994{
+private:
+    int cnt;
+    // dis用来记时间
+    int dis[10][10];
+    int dir_x[4]={0, 1, 0, -1};
+    int dir_y[4]={1, 0, -1, 0};
+public:
+    int orangesRotting(vector<vector<int>>& grid){
+        queue<pair<int, int>> Q;
+        // 所有位置设为-1
+        memset(dis, -1, sizeof(dis));
+        cnt = 0;
+        int m = grid[0].size(), n = grid.size(), ans = 0;
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                if(grid[i][j] == 2){
+                    Q.push(make_pair(i, j));
+                    dis[i][j] = 0;
+                }
+                else if(grid[i][j] == 1) cnt += 1;
+            }
+        }
 
-//         while(!Q.empty()){
-//             pair<int, int> x = Q.front(); Q.pop();
-//             for(int i = 0; i < 4; i++){
-//                 int tx = x.first + dir_x[i];
-//                 int ty = x.second + dir_y[i];
-//                 // 判断是否出界, 或者已经访问过， 或者为空地
-//                 if(tx < 0 || tx >= n || ty < 0 || ty >= m || dis[tx][ty] == 0 || grid[tx][ty] == 0) continue;
-//                 dis[tx][ty] = dis[x.first][x.second] + 1;
-//             }
-//         }
-//     }
-// };
+        while(!Q.empty()){
+            pair<int, int> x = Q.front(); Q.pop();
+            for(int i = 0; i < 4; i++){
+                int tx = x.first + dir_x[i];
+                int ty = x.second + dir_y[i];
+                // 判断是否出界, 或者已经被传播为坏橘子（dis[tx][ty] != -1）， 或者为空地
+                if(tx < 0 || tx >= n || ty < 0 || ty >= m || dis[tx][ty] != -1 || grid[tx][ty] == 0) continue;
+                // 新腐化的坏橘子
+                dis[tx][ty] = dis[x.first][x.second] + 1;
+                Q.push(make_pair(tx, ty));
+                cnt -= 1;
+                ans = dis[tx][ty];
+                if (!cnt) break;
+            }
+        }
+        return cnt ? -1:ans;
+    }
+};
+
+class Solution207_dfs {
+private:
+    vector<vector<int>> edges;
+    vector<int> visited;
+public:
+    bool dfs(int u){
+        visited[u] = 1;
+        for(int v: edges[u]){
+            if(visited[v] == 0){
+                if(dfs(v) == false) return false;
+            }
+            else if (visited[v] == 1){
+                return false;
+            }
+        }
+        visited[u] = 2;
+        return true;
+    }
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        edges.resize(numCourses);
+        visited.resize(numCourses);
+        // edges[i]代表目的节点为i的所有源节点的集合
+        for (const auto& info: prerequisites){
+            // 这里两个变量交换位置也可以，意思变为：源节点为i的所有目的节点的集合。
+            // 但是不换比较好，具有实际意义：学某门课的前提课程
+            edges[info[1]].push_back(info[0]);
+        }
+        for(int i = 0; i < numCourses; i++){
+            if(visited[i] == 0){
+                if(!dfs(i)) return false;
+            }
+        }
+        return true;
+    }
+};
+
+class Solution207_bfs{
+    vector<vector<int>> edges;
+    vector<int> indeg;
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites){
+        edges.resize(numCourses);
+        indeg.resize(numCourses);
+        for(const vector<int>& info: prerequisites){
+            edges[info[1]].push_back(info[0]);
+            indeg[info[0]]++;
+        }
+
+        queue<int> q;
+        for(int i = 0; i < numCourses; i++){
+            if(indeg[i] == 0) q.push(i);
+        }
+
+        int visited = 0;
+        while(!q.empty()){
+            visited++;
+            int u = q.front();q.pop();
+            // 前导为u的课程。
+            for(int v: edges[u]){
+                indeg[v]--;
+                if(indeg[v] == 0) q.push(v);
+            }
+        }
+
+        return visited == numCourses;
+    }
+};
+
+// 210. 课程表 II
+class Solution210 {
+    vector<vector<int>> edges;
+    vector<int> visited;
+    vector<int> res;
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        edges.resize(numCourses);
+        visited.resize(numCourses);
+        for (const auto& info: prerequisites){
+            // 先修课程为i的课程集合
+            edges[info[1]].push_back(info[0]);
+        }
+        for(int i = 0; i < numCourses; i++){
+            if(visited[i] == 0){
+                dfs(i, numCourses);
+            }
+        }
+        reverse(res.begin(), res.end());
+        if(res.size() == numCourses) return res;
+        return {};
+    }
+
+    bool dfs(int n, int& numCourses){
+        visited[n] = 1;
+        for(int node: edges[n]){
+            if(visited[node] == 0){
+                if(dfs(node, numCourses) == false) return false;
+            }
+            else if(visited[node] == 1){
+                return false;
+            }
+        }
+        visited[n] = 2;
+        res.push_back(n);
+        return true;
+    }
+};
+
+class Solution210_bfs{
+    vector<vector<int>> edges;
+    vector<int> indeg;
+    vector<int> res;
+    
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites){
+        edges.resize(numCourses);
+        indeg.resize(numCourses);
+        for(vector<int> info : prerequisites){
+            edges[info[1]].push_back(info[0]);
+            indeg[info[0]]++;
+        }
+
+        queue<int> q;
+
+        for(int i = 0; i < numCourses; i++){
+            if(indeg[i] == 0) q.push(i);
+        }
+
+        int visit = numCourses;
+        while(!q.empty()){
+            int course = q.front();q.pop();
+            visit--;
+            res.push_back(course);
+            for(int num : edges[course]){
+                indeg[num]--;
+                if(indeg[num] == 0) q.push(num);
+            }
+        }
+        if(visit) return {};
+        return res;
+    }
+};
 
 
 int main(){
@@ -883,7 +1025,11 @@ int main(){
     // prque.push(pair<int, int>(1, 2));
     // prque.push(pair<int, int>(2, 3));
     // cout << prque.top().second;
-    int a = -1;
-    cout << ~a;
+    Solution210 s;
+    vector<vector<int>> prerequisites{{0,1}, {1, 2}, {2, 3}, {3, 4}};
+    vector<int> res = s.findOrder(5, prerequisites);
+    for(int num: res){
+        cout << num << endl;
+    }
 }
 
