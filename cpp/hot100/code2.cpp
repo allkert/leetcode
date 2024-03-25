@@ -2,6 +2,7 @@
 #include<vector>
 #include<string>
 #include <stack>
+#include <queue>
 
 using namespace std;
 
@@ -226,6 +227,7 @@ class Solution394_recursion{
 string src;
 size_t ptr;
 public:
+    // 获取数字部分
     int getDigits(){
         int ret = 0;
         while(ptr < src.size() && isdigit(src[ptr])){
@@ -235,28 +237,105 @@ public:
     }
 
     string getString(){
+        // 终止条件
         if(ptr == src.size() || src[ptr] == ']') return "";
         char cur = src[ptr]; int repTime = 1;
         string ret;
+        // 如果当前字符是数字
         if(isdigit(cur)){
             repTime = getDigits();
-            // 过滤左括号
+            // 数字结束后一定是左括号，过滤左括号
             ptr++;
+            // 得到字符串，重复很多次
             string str = getString();
             ptr++;
             while(repTime--) ret += str;
         }
+        // 如果是字母
         else if(isalpha(cur)){
             ret = string(1, src[ptr++]);
         }
 
+        return ret + getString();
+
     }
     string decodeString(string s){
+        src = s;
+        ptr = 0;
+        return getString();
+    }
+};
 
+class Solution739 {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        vector<int> res(temperatures.size(), 0);
+        stack<int> st;
+        for(int i = 0; i < temperatures.size(); i++){
+            while(!st.empty() && temperatures[st.top()] < temperatures[i]){
+                res[st.top()] = i - st.top();
+                st.pop();
+            }
+            st.push(i);
+        }
+        return res;
+    }
+};
+
+// 记得看答案！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+class Solution215 {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        priority_queue<int, vector<int>, greater<int>> prique;
+        for(int num : nums){
+            prique.push(num);
+            if(prique.size() > k) prique.pop();
+        }
+        return prique.top();
+    }
+};
+
+class Solution118 {
+public:
+    vector<vector<int>> generate(int numRows) {
+        if(numRows == 1) return {{1}};
+        if(numRows == 2) return {{1}, {1,1}};
+        vector<int>dp{1,1};
+        vector<vector<int>> res;
+        res.push_back({1});
+        res.push_back({1, 1});
+        for(int i = 2; i < numRows; i++){
+            vector<int> nextdp(i+1);
+            nextdp[0] = dp[0];
+            nextdp[i] = dp[i-1];
+            for(int j = 1; j < i; j++){
+                nextdp[j] = dp[j-1] + dp[j];
+            }
+            dp = nextdp;
+            res.push_back(dp);
+        }
+        return res;
+    }
+};
+
+class Solution152 {
+public:
+    int maxProduct(vector<int>& nums) {
+        int dp0 = nums[0], dp1 = nums[0];
+        int res = nums[0];
+        for(int i = 1; i < nums.size(); i++){
+            dp = max(dp * nums[i], nums[i]);
+            res = max(res, dp);
+        }
+        return res;
     }
 };
 
 int main(){
-    Solution394 s;
-    s.decodeString("2[a2[bc]]");
+    Solution739 s;
+    vector<int> t = {73,74,75,71,71,72,76,73};
+    vector<int> res = s.dailyTemperatures(t);
+    for(int num : res){
+        cout << num;
+    }
 }
