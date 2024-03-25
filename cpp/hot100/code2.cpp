@@ -223,24 +223,38 @@ public:
 };
 
 class Solution394_recursion{
+string src;
+size_t ptr;
 public:
-    string decodeString(string s){
-        string ans = "";
-        for(int i = 0; i < s.size(); i++){
-            if(s[i] >= 'a' && s[i] <= 'z') ans += s[i];
-            else{
-                // 遇到数字取出数字
-                int cnt = 0;
-                while (s[i] >= '0' && s[i] <= '9') {
-                    cnt = cnt * 10 + s[i] - '0';
-                    i++;
-                }
-                int pos = i+1;
-                int lcnt = 1;
-            }
+    int getDigits(){
+        int ret = 0;
+        while(ptr < src.size() && isdigit(src[ptr])){
+            ret = ret * 10 + src[ptr++] - '0';
         }
+        return ret;
     }
-}
+
+    string getString(){
+        if(ptr == src.size() || src[ptr] == ']') return "";
+        char cur = src[ptr]; int repTime = 1;
+        string ret;
+        if(isdigit(cur)){
+            repTime = getDigits();
+            // 过滤左括号
+            ptr++;
+            string str = getString();
+            ptr++;
+            while(repTime--) ret += str;
+        }
+        else if(isalpha(cur)){
+            ret = string(1, src[ptr++]);
+        }
+
+    }
+    string decodeString(string s){
+
+    }
+};
 
 int main(){
     Solution394 s;
