@@ -94,6 +94,62 @@ public:
     }
 };
 
+class Solution_74 {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int row = 0, col = matrix[0].size() - 1;
+        while(row < matrix.size() && col >= 0){
+            if(matrix[row][col] > target) col--;
+            else if(matrix[row][col] < target) row++;
+            else return true;
+        }
+        return false;
+    }
+};
+
+class Solution33 {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size()-1;
+        while(left <= right){
+            int mid = (left + right) / 2;
+            if(nums[mid] == target) return mid;
+            // 如果左边有序
+            if(nums[left] <= nums[mid]){
+                if(nums[left] <= target && nums[mid] > target){
+                    right = mid - 1;
+                }
+                else left = mid + 1;
+            }
+            // 右边有序
+            else{
+                if(nums[mid] < target && nums[right] >= target) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+};
+
+class Solution153 {
+public:
+    int findMin(vector<int>& nums) {
+        return binarySearch(nums, 0, nums.size()-1);
+    }
+    int binarySearch(vector<int>& nums, int begin, int end){
+        if(begin > end) return INT_MAX;
+        if(nums[begin] <= nums[end]) return nums[begin];
+        int mid = (begin + end) / 2;
+        if(nums[mid] >= nums[begin]){
+            return min(nums[begin], binarySearch(nums, mid+1, end));
+        }
+        else{
+            return min(nums[mid], binarySearch(nums, begin, mid - 1));
+        }
+    }
+};
+
 
 int main(){
     Solution22 s;

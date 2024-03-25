@@ -8,12 +8,12 @@ using namespace std;
 // void test(int &a){
 //     a = 1;
 // }
-
 int main() {
-    vector<vector<int>> a = {{1,2}, {1,2}};
-    vector<vector<int>> b = a;
-    b[1][1] = 100;
-    cout << a[1][1];
-    a = b;
-    cout << a[1][1];
+    std::vector<int> v = {1, 2, 4, 4, 5, 6};
+    int value = 4;
+    auto it = std::upper_bound(v.begin(), v.end(), value, [](int a, int b) {
+        return a < b;  // 自定义的比较逻辑
+    });
+    cout << *it;
+    return 0;
 }
