@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include <stack>
 
 using namespace std;
 
@@ -150,13 +151,98 @@ public:
     }
 };
 
+// 155. 最小栈
+class MinStack {
+    stack<int> minStack;
+    stack<int> supStack;
+public:
+    MinStack() {
+        supStack.push(INT_MAX);
+    }
+    
+    void push(int val) {
+        minStack.push(val);
+        supStack.push(min(supStack.top(), val));
+    }
+    
+    void pop() {
+        minStack.pop();
+        supStack.pop();
+    }
+    
+    int top() {
+        return minStack.top();
+    }
+    
+    int getMin() {
+        return supStack.top();
+    }
+};
+
+
+class Solution394 {
+public:
+    string decodeString(string s) {
+        stack<char> st;
+        for(char ch : s){
+            if(ch != ']') st.push(ch);
+            // 遇到反中括号
+            else{
+                string temp = "";
+                while(!st.empty()){
+                    char t = st.top(); st.pop();
+                    if(t == '[') break;
+                    else temp = t + temp;
+                }
+                string strCount = "";
+                while(!st.empty()){
+                    char t = st.top(); 
+                    if(t >= '0' && t <= '9'){
+                        strCount = t + strCount;
+                        st.pop();
+                    }
+                    else break;
+                }
+                int count = stoi(strCount);
+                while(count){
+                    for(char c : temp){
+                        st.push(c);
+                    }
+                    count--;
+                }
+            }
+        }
+        string res = "";
+        while(!st.empty()){
+            res = st.top() + res;
+            st.pop();
+        }
+        cout << res;
+        return res;
+    }
+};
+
+class Solution394_recursion{
+public:
+    string decodeString(string s){
+        string ans = "";
+        for(int i = 0; i < s.size(); i++){
+            if(s[i] >= 'a' && s[i] <= 'z') ans += s[i];
+            else{
+                // 遇到数字取出数字
+                int cnt = 0;
+                while (s[i] >= '0' && s[i] <= '9') {
+                    cnt = cnt * 10 + s[i] - '0';
+                    i++;
+                }
+                int pos = i+1;
+                int lcnt = 1;
+            }
+        }
+    }
+}
 
 int main(){
-    Solution22 s;
-    vector<string> res;
-    res = s.generateParenthesis(2);
-    for(string s : res){
-        cout << s << endl;
-    }
-    return 0;
+    Solution394 s;
+    s.decodeString("2[a2[bc]]");
 }
