@@ -295,6 +295,64 @@ public:
     }
 };
 
+class Solution215_Ref1{
+    // 基于快排的选择方法
+    // 明白快排的原理，降序快排，只要一轮排序中provit出现在下标为k的地方，则为第k大的元素
+    int findKthLargest_quickSort(vector<int>& nums, int k) {
+        return quickSelect(nums, 0, nums.size()-1, k);    
+    }
+    int quickSelect(vector<int> &nums, int left, int right, int k){
+        if(left == right) return nums[k-1];
+        int provit = nums[left], l = left - 1, r = right + 1;
+        while(l < r){
+            do ++l; while(nums[l] > provit);
+            do --r; while(nums[r] < provit);
+            if (l < r) swap(nums[l], nums[r]);
+        }
+        if(r + 1 >= k) return quickSelect(nums, left, r, k);
+        else return quickSelect(nums, r + 1, right, k);
+    }
+
+    // 基于堆排序,但是你要自己实现,不然回去等通知
+    // 官方使用大根堆
+    // 首先自己实现一个大根堆
+    void maxHeapify(vector<int>& arr, int curIndex, int heapSize){
+        // 左孩子和右孩子
+        int left = 2 * curIndex + 1, right = 2 * curIndex + 2, largest = curIndex;
+        // 左孩子的值是否大于当前节点的值
+        if(left < heapSize && arr[left] > arr[largest]) largest = left;
+        if(right < heapSize && arr[right] > arr[largest]) largest = right;
+        if(curIndex != largest){
+            // 此时交换了节点值,可能破坏了被交换的那个子节点对应的子树的堆排序
+            swap(arr[curIndex], arr[largest]);
+            maxHeapify(arr, largest, heapSize);
+        }
+    }
+
+    void buildMaxHeap(vector<int> &arr, int heapSize){
+        for(int i = heapSize / 2; i >=0; i--){
+            maxHeapify(arr, i, heapSize);
+        }
+    }
+
+    int findKthLargest_MaxHeap(vector<int>& nums, int k){
+        // 建立大根堆
+        buildMaxHeap(nums, nums.size());
+        // for(int i = 0; i < nums.size(); i++){
+        //     cout << nums[i];
+        // }
+        // 进行k-1次最大值的剔除
+        for(int i = 1; i < k; i++){
+            swap(nums[0], nums[nums.size()-i]);
+            maxHeapify(nums, 0, nums.size() - i);
+        }
+        return nums[0];
+    }
+
+};
+
+
+
 class Solution118 {
 public:
     vector<vector<int>> generate(int numRows) {
@@ -320,22 +378,17 @@ public:
 
 class Solution152 {
 public:
-    int maxProduct(vector<int>& nums) {
-        int dp0 = nums[0], dp1 = nums[0];
-        int res = nums[0];
-        for(int i = 1; i < nums.size(); i++){
-            dp = max(dp * nums[i], nums[i]);
-            res = max(res, dp);
-        }
-        return res;
-    }
+
 };
+
+
 
 int main(){
     Solution739 s;
     vector<int> t = {73,74,75,71,71,72,76,73};
     vector<int> res = s.dailyTemperatures(t);
-    for(int num : res){
-        cout << num;
-    }
+    int i = 0;
+    do{
+        cout  << i++ << endl;
+    }while(i <= 10);
 }
