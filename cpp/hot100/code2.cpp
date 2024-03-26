@@ -476,15 +476,198 @@ public:
     }
 };
 
+// 大根堆的底层实现
+class MaxHeap{
+private:
+    vector<int> data;
+    // siftUp: 从下往上调整, 保证堆的性质
+    // 将子节点不停的和父节点比较, 如果子节点大于父节点, 则交换
+    // 这个并不会破坏父节点的另外一个子树的堆性质
+    void siftUp(int k){
+        while(k > 0 && data[(k-1)/2] < data[k]){
+            // (k-1)/2 是父节点的下标, 注意从0开始
+            swap(data[(k-1)/2], data[k]);
+            k = (k-1)/2;
+        }
+    }
+
+    // siftDown: 从上往下调整, 保证堆的性质
+    void siftDown(int k){
+        // 判断条件确保有孩子节点存在
+        while(2 * k + 1 < data.size()){
+            int left = 2 * k + 1;
+            int right = 2 * k + 2;
+            // 找到当前节点和左右孩子节点中最大的那个
+            int largest = k;
+            if(data[left] > data[largest]) largest = left;
+            if(right < data.size() && data[right] > data[largest]) largest = right;
+            // 最大的是当前节点, 说明已经满足堆性质
+            if(largest == k) break;
+            swap(data[k], data[largest]);
+            // 被交换的子节点的堆性质可能被破坏，因此需要继续向下检查
+            k = largest;
+        }
+    }
+public:
+    // 作为数据结构应该提供的操作接口
+    void push(int val){
+        data.push_back(val);
+        // 向上调整
+        siftUp(data.size() - 1);
+    }
+    void pop(){
+        // 把第一个元素放到最后去
+        swap(data[0], data[data.size()-1]);
+        // 向下调整第一个元素
+        data.pop_back();
+        siftDown(0);
+    }
+    int top(){
+        return data[0];
+    }
+    bool empty(){
+        return data.empty();
+    }
+    int size(){
+        return data.size();
+    }
+};
+
+// 295. 数据流的中位数
+class MedianFinder {
+private:
+    // 用来存比较大的那一部分数，且多一个
+    MinHeap minH;
+    // 用来存比较小的那部分数
+    MaxHeap maxH;
+public:
+    MedianFinder() {}
+    
+    void addNum(int num) {
+        if(minH.size() == maxH.size()){
+            maxH.push(num);
+            minH.push(maxH.top());
+            maxH.pop();
+        }
+        else{
+            minH.push(num);
+            maxH.push(minH.top());
+            minH.pop();
+        }
+    }
+    
+    double findMedian() {
+        if(minH.size() == maxH.size()) return (minH.top() + maxH.top()) / 2.0;
+        return minH.top();
+    }
+};
+
+
+// 152. 乘积最大子数组
+class Solution_152 {
+public:
+    int maxProduct(vector<int>& nums) {
+        int ans = nums[0];
+        vector<int> dp{nums[0], nums[0]};
+        for(int i = 1; i < nums.size(); i++){
+            int max_ = max(nums[i], max(dp[0] * nums[i], dp[1] * nums[i]));
+            int min_ = min(nums[i], min(dp[0] * nums[i], dp[1] * nums[i]));
+            ans = max(max_, ans);
+            dp = {max_, min_};
+        }
+        return ans;
+    }
+};
+
+
+class Solution32{
+public:
+    int longestValidParenthesesDP(string s) {
+        vector<int> dp(s.size(), 0);
+        int ans = 0;
+        for(int i = 1; i < s.size(); i++){
+            if(s[i] == ')'){
+                if(s[i-1] =='('){
+                    dp[i] = i >= 2? dp[i-2] + 2 : 2;
+                }
+                else{
+                    if(i - dp[i-1] - 1 == 0 && s[i - dp[i-1] - 1] == '(') dp[i] = 2 + dp[i-1];
+                    if(i - dp[i-1] - 1 > 0 && s[i - dp[i-1] - 1] == '(') dp[i] = dp[i - dp[i-1] - 2] + 2 + dp[i-1];
+                }
+            }
+            ans = max(ans, dp[i]);
+        }
+        return ans;
+    }
+};
+
+// 64. 最小路径和
+class Solution64 {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        vector<int> dp(grid[0].size(), 0);
+        dp[0] = grid[0][0];
+        for(int i = 1; i < dp.size(); i++){
+            dp[i] = dp[i-1] + grid[0][i];
+        }
+        for(int i = 1; i < grid.size(); i++){
+            dp[0] += grid[i][0];
+            for(int j = 1; j < dp.size(); j++){
+                dp[j] = min(dp[j-1]+ grid[i][j], dp[j] + grid[i][j]);
+            }
+        }
+        return *dp.rbegin();
+    }
+};
+
+class Solution136 {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ret = 0;
+        for(int num : nums){
+            ret ^= num;
+        }
+        return ret;
+    }
+};
+
+class Solution169 {
+public:
+    int majorityElement(vector<int>& nums) {
+        int candidate = -1, count = 0;
+        for(int num : nums){
+            if(num == candidate) count++;
+            else if(--count < 0){
+                candidate = num;
+                count = 1;
+            }
+        }
+        return candidate;
+    }
+};
+class Solution75 {
+public:
+    void sortColors(vector<int>& nums) {
+        int n = nums.size();
+        int p0 = 0, p1 = 0;
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] == 1) {
+                swap(nums[i], nums[p1]);
+                ++p1;
+            } else if (nums[i] == 0) {
+                swap(nums[i], nums[p0]);
+                if (p0 < p1) {
+                    swap(nums[i], nums[p1]);
+                }
+                ++p0;
+                ++p1;
+            }
+        }
+    }
+};
 
 
 int main(){
-    MinHeap minHeap;
-    minHeap.push(3);
-    minHeap.push(2);
-    minHeap.push(1);
-    minHeap.push(15);
-    cout << minHeap.top() << endl;
-    minHeap.pop();
-    cout << minHeap.top() << endl;
+    Solution32 s;
+    cout << s.longestValidParenthesesDP("(()())");
 }
