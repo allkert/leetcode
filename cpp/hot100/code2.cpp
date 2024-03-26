@@ -379,34 +379,112 @@ public:
 // 42. 接雨水
 class Solution_42{
 public:
-    int trap(vector<int>& height) {
+    int trap(vector<int>& height){
+        // 单调递减栈
         stack<int> st;
-        st.push(0);
-        int sum = 0;
-        for (int i = 1; i < height.size(); i++) {
-            while (!st.empty() && height[i] > height[st.top()]) {
-                int mid = st.top();
-                st.pop();
-                if (!st.empty()) {
-                    int h = min(height[st.top()], height[i]) - height[mid];
-                    int w = i - st.top() - 1;
-                    sum += h * w;
+        int ans = 0;
+        for(int i = 0; i < height.size(); i++){
+            while(!st.empty() && height[i] > height[st.top()]){
+                int mid = st.top(); st.pop();
+                if(!st.empty()){
+                    ans += (min(height[i], height[st.top()]) - height[mid]) * (i - st.top() - 1); 
                 }
             }
             st.push(i);
         }
-        return sum;
+        return ans;
+    }
+};
+
+// 84 柱状图中的最大矩形
+class Solution_84 {
+public:
+
+
+    int largestRectangleArea(vector<int>& heights){
+        // 从栈底到栈顶是单调增的, 存高度对应的下标。
+        stack<int> st;
+        heights.insert(heights.begin(), 0);
+        heights.push_back(0);
+        int max_ = 0;
+        for(int i = 0; i < heights.size(); i++){
+            while(!st.empty() && heights[i] < heights[st.top()]){
+                int mid = st.top(); st.pop();
+                // 从 st.top() 到 i 这个区间里面全部是高度同样可以视为heights[mid]的柱子。
+                max_ = max(max_, (i - st.top() - 1) * heights[mid]);
+            }
+            st.push(i);
+        }
+        return max_;
+    }
+};
+
+// 小根堆的底层实现
+class MinHeap{
+private:
+    vector<int> data;
+    // siftUp: 从下往上调整, 保证堆的性质
+    // 将子节点不停的和父节点比较, 如果子节点小于父节点, 则交换
+    // 这个并不会破坏父节点的另外一个子树的堆性质
+    void siftUp(int k){
+        while(k > 0 && data[(k-1)/2] > data[k]){
+            // (k-1)/2 是父节点的下标, 注意从0开始
+            swap(data[(k-1)/2], data[k]);
+            k = (k-1)/2;
+        }
+    }
+
+    // siftDown: 从上往下调整, 保证堆的性质
+    void siftDown(int k){
+        // 判断条件确保有孩子节点存在
+        while(2 * k + 1 < data.size()){
+            int left = 2 * k + 1;
+            int right = 2 * k + 2;
+            // 找到当前节点和左右孩子节点中最小的那个
+            int smallest = k;
+            if(data[left] < data[smallest]) smallest = left;
+            if(right < data.size() && data[right] < data[smallest]) smallest = right;
+            // 最小的是当前节点, 说明已经满足堆性质
+            if(smallest == k) break;
+            swap(data[k], data[smallest]);
+            // 被交换的子节点的堆性质可能被破坏，因此需要继续向下检查
+            k = smallest;
+        }
+    }
+public:
+    // 作为数据结构应该提供的操作接口
+    void push(int val){
+        data.push_back(val);
+        // 向上调整
+        siftUp(data.size() - 1);
+    }
+    void pop(){
+        // 把第一个元素放到最后去
+        swap(data[0], data[data.size()-1]);
+        // 向下调整第一个元素
+        data.pop_back();
+        siftDown(0);
+    }
+    int top(){
+        return data[0];
+    }
+    bool empty(){
+        return data.empty();
+    }
+    int size(){
+        return data.size();
     }
 };
 
 
 
 int main(){
-    Solution739 s;
-    vector<int> t = {73,74,75,71,71,72,76,73};
-    vector<int> res = s.dailyTemperatures(t);
-    int i = 0;
-    do{
-        cout  << i++ << endl;
-    }while(i <= 10);
+    MinHeap minHeap;
+    minHeap.push(3);
+    minHeap.push(2);
+    minHeap.push(1);
+    minHeap.push(15);
+    cout << minHeap.top() << endl;
+    minHeap.pop();
+    cout << minHeap.top() << endl;
 }
