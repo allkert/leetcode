@@ -667,7 +667,74 @@ public:
 };
 
 
+// 31. 下一个排列
+class Solution31 {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int ptr;
+        for(ptr = nums.size() - 1; ptr > 0 && nums[ptr] <= nums[ptr-1]; ptr--);
+        if(!ptr) quickSort(nums, 0, nums.size()-1);
+        else{
+            int index = nums.size() - 1;
+            while(nums[index] <= nums[ptr-1]) index--;
+            swap(nums[ptr-1], nums[index]);
+            quickSort(nums, ptr, nums.size() - 1);
+        }
+    }
+
+    void quickSort(vector<int>& nums, int begin, int end){
+        if(begin >= end) return;
+        int left = begin, right = end, key = nums[begin];
+        while(left < right){
+            while(left < right && nums[right] >= key) right--;
+            nums[left] = nums[right];
+            while(left < right && nums[left] <= key) left++;
+            nums[right] = nums[left];
+        }
+        nums[left] = key;
+        quickSort(nums, begin, left - 1);
+        quickSort(nums, left + 1, end);
+    }
+};
+
+
+class Solution287 {
+public:
+    // 二分查找的方法
+    int findDuplicateBinarySearch(vector<int>& nums) {
+        int n = nums.size();
+        int left = 1, right = n - 1, ans = -1;
+        while(left <= right){
+            int mid = (left + right) / 2;
+            int cnt = 0;
+            for(int i = 0; i < n; i++){
+                cnt += (nums[i] <= mid);
+            }
+            if(cnt <= mid) left = mid + 1;
+            else{
+                right = mid - 1;
+            }
+            ans = left;
+        }
+        return ans;
+    }
+
+    // 位运算
+    int findDuplicateBitCompute(vector<int>& nums){
+        int n = nums.size(), ans = 0;
+        int bit_max = 31;
+        // 确定非0的最高比特位
+        // while()
+        return 1;
+    }
+};
+
+
 int main(){
-    Solution32 s;
-    cout << s.longestValidParenthesesDP("(()())");
+    Solution31 s;
+    vector<int> nums = {7, 5, 4, 3, 2, 2, 1};
+    
+    int a = 2;
+    int b = (a>>1);
+    cout << b;
 }
