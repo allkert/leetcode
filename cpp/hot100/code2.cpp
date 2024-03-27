@@ -724,9 +724,36 @@ public:
         int n = nums.size(), ans = 0;
         int bit_max = 31;
         // 确定非0的最高比特位
-        // while()
-        return 1;
+        while(((n-1) >> bit_max) == 0) bit_max--;
+        // 此时确定了最大的数的最高非零比特位为第bit_max+1位,即权重为2^bit_max的位
+
+        for(int bit = 0; bit <= bit_max; bit++){
+            // x: nums中第i位为1的数的个数
+            // y: 1-n中第i位为1的数的个数nums中第i位为1的数的个数
+            int x = 0, y = 0;
+            for(int i = 0; i < n; i++){
+                if(nums[i] & (1 << bit)) x++;
+                if((i & (1 << bit))) y++;
+            }
+            if(x > y) ans |= (1 << bit);
+        }
+        return ans;
     }
+
+    // 快慢指针
+    int findDuplicateFastSlowPointer(vector<int>& nums){
+        int slow = 0, fast = 0;
+        do{
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        }while(slow != fast);
+        slow = 0;
+        while(slow != fast){
+            slow = nums[slow];
+            fast = nums[fast];
+        }
+        return slow;
+    }    
 };
 
 
