@@ -18,6 +18,8 @@ public:
     int maxArea(vector<int>& height);
     vector<vector<int>> threeSum(vector<int>& nums);
     int trap(vector<int>& height);
+    int lengthOfLongestSubstring(string s);
+    vector<int> findAnagrams(string s, string p);
 };
 
 vector<int> Solution::twoSum(vector<int>& nums, int target) {
@@ -135,11 +137,39 @@ int Solution::trap(vector<int>& height){
     return ans;
 }
 
+int Solution::lengthOfLongestSubstring(string s){
+    unordered_set<char> uset;
+    int i = 0, j = 0;
+    int ans = 0;
+    while(j < s.size()){
+        while(uset.find(s[j]) != uset.end()){
+            uset.erase(s[i++]);
+        }
+        uset.insert(s[j++]);
+        ans = max(ans, j-i);
+    }
+    return ans;
+}
+
+vector<int> Solution::findAnagrams(string s, string p){
+    vector<int> count_p(26, 0);
+    vector<int> count_s(26, 0);
+    vector<int> ans;
+    for(char ch : p){
+        count_p[ch - 'a']++;
+    }
+    int left = 0;
+    for(int right = 0; right < s.size(); right++){
+        count_s[s[right] - 'a']++;
+        if(right - left + 1 == p.size()){
+            if(count_p == count_s) ans.push_back(left);
+            count_s[s[left++] - 'a']--;
+        }
+    }
+    return ans;
+}
+
 int main(){
     Solution s;
-    vector<int> nums{0, 1, 0, 2, 0, 3, 0};
-    s.moveZeroes(nums);
-    for(auto num : nums){
-        cout << num << ' ';
-    }
+    cout << s.lengthOfLongestSubstring("ababcbb");
 }
