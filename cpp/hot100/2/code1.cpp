@@ -20,6 +20,28 @@ public:
     int trap(vector<int>& height);
     int lengthOfLongestSubstring(string s);
     vector<int> findAnagrams(string s, string p);
+    int subarraySum(vector<int> &nums, int k);
+    vector<int> maxSlidingWindow(vector<int> &nums, int k);
+};
+
+class MyPriorityQueue{
+private:
+    deque<int> dq;
+    
+public:
+    int front(){
+        return dq.front();
+    }
+    void popright(){
+        dq.pop_front();
+    }
+    void push(int val){
+        while(!dq.empty() && dq.back() < val) dq.pop_back();
+        dq.push_back(val);
+    }
+    bool empty() {
+        return dq.empty();
+    }
 };
 
 vector<int> Solution::twoSum(vector<int>& nums, int target) {
@@ -33,7 +55,6 @@ vector<int> Solution::twoSum(vector<int>& nums, int target) {
     }
     return {};
 }
-
 vector<vector<string>> Solution::groupAnagrams(vector<string>& strs){
     // 自定义哈希函数
     auto fn = hash<int>{};
@@ -58,7 +79,6 @@ vector<vector<string>> Solution::groupAnagrams(vector<string>& strs){
     }
     return ans;
 }  
-
 int Solution::longestConsecutive(vector<int>& nums){
     unordered_set<int> uset;
     for(const int& num : nums) uset.insert(num);
@@ -76,7 +96,6 @@ int Solution::longestConsecutive(vector<int>& nums){
     }
     return ans;
 }
-
 void Solution::moveZeroes(vector<int>& nums){
     int i = 0, j = 0;
     while(j < nums.size()){
@@ -90,7 +109,6 @@ void Solution::moveZeroes(vector<int>& nums){
         nums[k] = 0;
     }
 }
-
 int Solution::maxArea(vector<int>& height){
     int left = 0, right = height.size()-1;
     int ans = 0;
@@ -101,7 +119,6 @@ int Solution::maxArea(vector<int>& height){
     }
     return ans;
 }
-
 vector<vector<int>> Solution::threeSum(vector<int>& nums){
     sort(nums.begin(), nums.end(), less<int>{});
     vector<vector<int>> ans;
@@ -123,7 +140,6 @@ vector<vector<int>> Solution::threeSum(vector<int>& nums){
     }
     return ans;
 }
-
 int Solution::trap(vector<int>& height){
     stack<int> st;
     int ans = 0;
@@ -136,7 +152,6 @@ int Solution::trap(vector<int>& height){
     }
     return ans;
 }
-
 int Solution::lengthOfLongestSubstring(string s){
     unordered_set<char> uset;
     int i = 0, j = 0;
@@ -150,7 +165,6 @@ int Solution::lengthOfLongestSubstring(string s){
     }
     return ans;
 }
-
 vector<int> Solution::findAnagrams(string s, string p){
     vector<int> count_p(26, 0);
     vector<int> count_s(26, 0);
@@ -165,6 +179,30 @@ vector<int> Solution::findAnagrams(string s, string p){
             if(count_p == count_s) ans.push_back(left);
             count_s[s[left++] - 'a']--;
         }
+    }
+    return ans;
+}
+int Solution::subarraySum(vector<int>& nums, int k) {
+    unordered_map<int, int> umap;
+    int pre = 0;
+    umap[0]++;
+    int ans = 0;
+    for(int i = 0; i < nums.size(); i++){
+        pre += nums[i];
+        if(umap.find(pre - k) != umap.end()) ans += umap[pre - k];
+        umap[pre]++;
+    }
+    return ans;
+}
+vector<int> Solution::maxSlidingWindow(vector<int>& nums, int k) {
+    MyPriorityQueue dq;
+    vector<int> ans;
+    for(int i = 0; i < k; i++) dq.push(nums[i]);
+    ans.push_back(dq.front());
+    for(int i = k; i < nums.size(); i++){
+        dq.push(nums[i]);
+        if(!dq.empty() && dq.front() == nums[i - k]) dq.popright();
+        ans.push_back(dq.front());
     }
     return ans;
 }
