@@ -22,6 +22,11 @@ public:
     vector<int> findAnagrams(string s, string p);
     int subarraySum(vector<int> &nums, int k);
     vector<int> maxSlidingWindow(vector<int> &nums, int k);
+    string minWindow(string s, string t);
+    int maxSubArray(vector<int> &nums);
+private:
+    void qucikSort_56(vector<vector<int>>& intervals, int beginIndex, int endIndex);
+
 };
 
 class MyPriorityQueue{
@@ -206,7 +211,45 @@ vector<int> Solution::maxSlidingWindow(vector<int>& nums, int k) {
     }
     return ans;
 }
+string Solution::minWindow(string s, string t){
+    unordered_map<char, int> hs, ht;
+    string ans = "";
+    int cnt = 0;
+    // 统计t中各个字符出现的次数
+    for(char ch : t) ht[ch]++;
 
+    // 滑动窗口
+    for(int i = 0, j = 0; i < s.size(); i++){
+        // 右边界向右滑动一位
+        if(hs[s[i]] < ht[s[i]]) cnt++;
+        hs[s[i]]++;
+        // 去除左边所有没有用的字符，从而减少子串长度
+        while(hs[s[j]] > ht[s[j]]) hs[s[j++]]--;
+        // 找到一个覆盖子串
+        if(cnt == t.size()){
+            if(ans.size() == 0 || ans.size() > i - j + 1){
+                ans = s.substr(j, i - j + 1);
+            }
+        }
+    }
+    return ans;
+}
+int Solution::maxSubArray(vector<int>& nums){
+    int ans = nums[0];
+    int dp = nums[0];
+    for(int i = 1; i < nums.size(); i++){
+        dp = max(nums[i], dp + nums[i]);
+        ans = max(dp, ans);
+    }
+    return ans;
+}
+void Solution::qucikSort_56(vector<vector<int>>& intervals, int beginIndex, int endIndex){
+    if(beginIndex >= endIndex) return;
+    int left = beginIndex, right = endIndex, provit = intervals[beginIndex][0];
+    while(left < right){
+        do left++; while(intervals[left][0] < )
+    }
+}
 int main(){
     Solution s;
     cout << s.lengthOfLongestSubstring("ababcbb");
