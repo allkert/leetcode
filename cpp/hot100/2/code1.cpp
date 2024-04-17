@@ -24,9 +24,10 @@ public:
     vector<int> maxSlidingWindow(vector<int> &nums, int k);
     string minWindow(string s, string t);
     int maxSubArray(vector<int> &nums);
-private:
     void qucikSort_56(vector<vector<int>>& intervals, int beginIndex, int endIndex);
-
+    vector<vector<int>> merge(vector<vector<int>> &intervals);
+    void rotate(vector<int> &nums, int k);
+    vector<int> productExceptSelf(vector<int> &nums);
 };
 
 class MyPriorityQueue{
@@ -245,12 +246,54 @@ int Solution::maxSubArray(vector<int>& nums){
 }
 void Solution::qucikSort_56(vector<vector<int>>& intervals, int beginIndex, int endIndex){
     if(beginIndex >= endIndex) return;
-    int left = beginIndex, right = endIndex, provit = intervals[beginIndex][0];
+    int left = beginIndex, right = endIndex, provit = beginIndex;
     while(left < right){
-        do left++; while(intervals[left][0] < )
-    }
+        while(left < right && intervals[right][0] >= intervals[provit][0]) right--;
+        while(left < right && intervals[left][0] <= intervals[provit][0]) left++;
+        if(left < right) swap(intervals[left], intervals[right]);
+    } 
+    swap(intervals[left], intervals[provit]);
+    qucikSort_56(intervals, beginIndex, left - 1);
+    qucikSort_56(intervals, left + 1, endIndex);
 }
+vector<vector<int>> Solution:: merge(vector<vector<int>>& intervals) {
+    qucikSort_56(intervals, 0, intervals.size() - 1);
+    vector<int> zone = intervals[0];
+    vector<vector<int>> res;
+    for(int i = 1; i < intervals.size(); i++){
+        if(intervals[i][0] <= zone[1]) zone[1] = max(intervals[i][1], zone[1]);
+        else{
+            res.emplace_back(zone);
+            zone = intervals[i];
+        }
+    }
+    res.emplace_back(zone);
+    return res;
+}
+void Solution::rotate(vector<int>& nums, int k){
+    k = k % nums.size();
+    reverse(nums.begin(), nums.end());
+    reverse(nums.begin(), nums.begin() + k);
+    reverse(nums.begin() + k, nums.end());
+}
+vector<int> Solution::productExceptSelf(vector<int>& nums){
+    vector<int> res(nums.size(), 1);
+    for(int i = 1; i < nums.size(); i++){
+        res[i] = res[i-1] * nums[i-1]; 
+    }
+    int multiAcc = 1;
+    for(int i = nums.size() - 2; i >= 0; i--){
+        multiAcc *= nums[i+1];
+        res[i] *= multiAcc;
+    }
+    return res;
+}
+
 int main(){
     Solution s;
-    cout << s.lengthOfLongestSubstring("ababcbb");
+    vector<vector<int>> intervals = {{2,3},{2,2},{1,1}};
+    s.qucikSort_56(intervals, 0, 2);
+    for(auto a : intervals){
+        cout << "{" << a[0] << "," << a[1] << "}" << '\t';
+    }
 }
