@@ -28,6 +28,7 @@ public:
     vector<vector<int>> merge(vector<vector<int>> &intervals);
     void rotate(vector<int> &nums, int k);
     vector<int> productExceptSelf(vector<int> &nums);
+    int firstMissingPositive(vector<int> &nums);
 };
 
 class MyPriorityQueue{
@@ -288,12 +289,25 @@ vector<int> Solution::productExceptSelf(vector<int>& nums){
     }
     return res;
 }
-
+int Solution::firstMissingPositive(vector<int>& nums){
+    /* 思路：把所以的数字，调整到它应该出现的位置上
+        然后再遍历一遍，找到缺失的数 */
+    // index为i的位置应该放数字i+1
+    for(int i = 0; i < nums.size(); i++){
+        if(nums[i] <= nums.size() && nums[i] >= 1){
+            if(nums[nums[i] - 1] != nums[i]) swap(nums[i], nums[nums[i] - 1]);
+        }
+    }
+    for(int i = 0; i < nums.size(); i++){
+        if(nums[i] != i + 1) return i + 1;
+    }
+    return nums.size() + 1;
+}
 int main(){
     Solution s;
-    vector<vector<int>> intervals = {{2,3},{2,2},{1,1}};
-    s.qucikSort_56(intervals, 0, 2);
-    for(auto a : intervals){
-        cout << "{" << a[0] << "," << a[1] << "}" << '\t';
+    vector<int> nums{3, 4, -1 ,1};
+    cout << s.firstMissingPositive(nums) << endl;
+    for(auto num : nums){
+        cout << num;
     }
 }
