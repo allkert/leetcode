@@ -9,6 +9,12 @@
 
 using namespace std;
 
+struct ListNode {
+     int val;
+     ListNode *next;
+     ListNode(int x) : val(x), next(NULL) {}
+};
+
 class Solution{
 public:
     vector<int> twoSum(vector<int>& nums, int target);
@@ -29,6 +35,11 @@ public:
     void rotate(vector<int> &nums, int k);
     vector<int> productExceptSelf(vector<int> &nums);
     int firstMissingPositive(vector<int> &nums);
+    void setZeroes(vector<vector<int>> &matrix);
+    vector<int> spiralOrder(vector<vector<int>> &matrix);
+    void rotate(vector<vector<int>> &matrix);
+    bool searchMatrix(vector<vector<int>> &matrix, int target);
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB);
 };
 
 class MyPriorityQueue{
@@ -294,14 +305,119 @@ int Solution::firstMissingPositive(vector<int>& nums){
         然后再遍历一遍，找到缺失的数 */
     // index为i的位置应该放数字i+1
     for(int i = 0; i < nums.size(); i++){
-        if(nums[i] <= nums.size() && nums[i] >= 1){
-            if(nums[nums[i] - 1] != nums[i]) swap(nums[i], nums[nums[i] - 1]);
+        while(nums[i] > 0 && nums[i] <= nums.size() && nums[i] != nums[nums[i] - 1]){
+            swap(nums[i], nums[nums[i] - 1]);
         }
     }
     for(int i = 0; i < nums.size(); i++){
         if(nums[i] != i + 1) return i + 1;
     }
     return nums.size() + 1;
+}
+void Solution::setZeroes(vector<vector<int>>& matrix){
+    int colTag = 1;
+    for(int i = 0; i < matrix.size(); i++){
+        if(matrix[i][0] == 0) colTag = 0;
+        for(int j = 1; j < matrix[0].size(); j++){
+            if(matrix[i][j] == 0){
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+    for(int i = matrix.size() - 1; i >= 0; i--){
+        for(int j = 1; j < matrix[0].size(); j++){
+            if(matrix[i][0] == 0 || matrix[0][j] == 0) matrix[i][j] = 0;
+        }
+        if(colTag == 0) matrix[i][0] = 0;
+    }
+}
+vector<int> Solution::spiralOrder(vector<vector<int>>& matrix){
+    int left = 0, right = matrix[0].size() - 1;
+    int up = 0, down = matrix.size() - 1;
+    int direction = 0;
+    vector<int> ans;
+    while(left <= right && up <= down){
+        switch (direction % 4)
+        {
+        case 0:
+            for(int i = left; i <= right; i++){
+                ans.emplace_back(matrix[up][i]);
+            }
+            up++;
+            break;
+        case 1:
+            for(int i = up; i <= down; i++){
+                ans.emplace_back(matrix[i][right]);
+            }
+            right--;
+            break;
+        case 2:
+            for(int i = right; i >= left; i--){
+                ans.emplace_back(matrix[down][i]);
+            }
+            down--;
+            break;
+        case 3:
+            for(int i = down; i >= up; i--){
+                ans.emplace_back(matrix[i][left]);
+            }
+            left++;
+            break;
+        }
+        direction++;
+    }
+    return ans;
+}
+void Solution::rotate(vector<vector<int>>& matrix){
+    int n = matrix.size();
+    for(int i = 0; i < n/2; i++){
+        for(int j = 0; j < (n+1)/2; j++){
+            int tmp = matrix[i][j];
+            matrix[i][j] = matrix[n-1-j][i];
+            matrix[n-1-j][i] = matrix[n-1-i][n-1-j];
+            matrix[n-1-i][n-1-j] = matrix[j][n-1-i];
+            matrix[j][n-1-i] = tmp;
+        }
+    }
+}
+bool Solution::searchMatrix(vector<vector<int>>& matrix, int target) {
+    int x = 0, y = matrix[0].size()-1;
+    while(x < matrix.size() && y >= 0){
+        if(matrix[x][y] < target)  x++;
+        else if(matrix[x][y] > target) y--;
+        else return true;
+    }
+    return false;
+}
+ListNode* Solution::getIntersectionNode(ListNode *headA, ListNode *headB){
+    if(headA == nullptr || headB == nullptr) return NULL;
+    int lenA = 0, lenB = 0;
+    ListNode* curA = headA, *curB = headB;
+    while(curA != NULL){
+        lenA++;
+        curA = curA->next;
+    }
+    while(curB != NULL){
+        lenB++;
+        curB = curB->next;
+    }
+    curA = headA; curB = headB;
+    if(lenA < lenB){
+        swap(curA, curB);
+        swap(lenA, lenB);
+    }
+    int i = 0;
+    while(i < lenA - lenB){
+        curA = curA->next;
+        i++;
+    }
+    while(curA != NULL && curB != NULL){
+        if(curA == curB) return curA;
+        curA = curA->next;
+        curB = curB->next;
+    }
+    return NULL;
 }
 int main(){
     Solution s;
