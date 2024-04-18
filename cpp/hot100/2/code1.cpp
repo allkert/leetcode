@@ -41,6 +41,8 @@ public:
     bool searchMatrix(vector<vector<int>> &matrix, int target);
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB);
     ListNode *reverseList(ListNode* head);
+    bool isPalindrome(ListNode *head);
+    void reverseLength(ListNode* head, int size);
 };
 
 class MyPriorityQueue{
@@ -421,16 +423,58 @@ ListNode* Solution::getIntersectionNode(ListNode *headA, ListNode *headB){
     return NULL;
 }
 ListNode* Solution::reverseList(ListNode* head) {
-    ListNode* dommyHead;
-    dommyHead->next = head;
-    
+    if(head == NULL) return head;
+    ListNode* pre = NULL;
+    ListNode* cur = head;
+    ListNode* tmp;
+    while(cur){
+        tmp = cur->next;
+        cur->next = pre;
+        pre = cur;
+        cur = tmp;
+    }
+    return pre;
 }
 
-int main(){
-    Solution s;
-    vector<int> nums{3, 4, -1 ,1};
-    cout << s.firstMissingPositive(nums) << endl;
-    for(auto num : nums){
-        cout << num;
+
+bool Solution::isPalindrome(ListNode* head) {
+    if(head == NULL || head->next == NULL) return true;
+    ListNode *slow = head, *fast = head->next;
+    int tag = 1;
+    while(fast->next && fast->next->next){
+        tag++;
+        slow = slow->next;
+        fast = fast->next->next;
     }
+    ListNode* left = slow;
+    ListNode* right;
+    ListNode* rightHead = slow->next;
+    // 节点数是偶数
+    if(fast->next == NULL) right = slow->next;
+    else right = slow->next->next;
+    reverseLength(head, tag);
+    while(left != NULL && right != NULL){
+        if(left->val != right->val) {
+            reverseLength(slow, tag);
+            slow->next = rightHead;
+            return false;
+        }
+        left = left->next;
+        right = right->next;
+    }
+    reverseLength(slow, tag);
+    slow->next = rightHead;
+    return true;
+}
+
+void Solution::reverseLength(ListNode *head, int size) {
+    ListNode* pre = NULL;
+    ListNode* cur = head;
+    ListNode* tmp;
+    for(int i = 0; i < size; i++){
+        tmp = cur->next;
+        cur->next = pre;
+        pre = cur;
+        cur = tmp;
+    }    
 }
