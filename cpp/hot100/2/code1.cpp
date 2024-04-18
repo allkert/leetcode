@@ -40,6 +40,7 @@ public:
     void rotate(vector<vector<int>> &matrix);
     bool searchMatrix(vector<vector<int>> &matrix, int target);
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB);
+    ListNode *reverseList(ListNode* head);
 };
 
 class MyPriorityQueue{
@@ -419,6 +420,12 @@ ListNode* Solution::getIntersectionNode(ListNode *headA, ListNode *headB){
     }
     return NULL;
 }
+ListNode* Solution::reverseList(ListNode* head) {
+    ListNode* dommyHead;
+    dommyHead->next = head;
+    
+}
+
 int main(){
     Solution s;
     vector<int> nums{3, 4, -1 ,1};
