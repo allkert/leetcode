@@ -43,6 +43,9 @@ public:
     ListNode *reverseList(ListNode* head);
     bool isPalindrome(ListNode *head);
     void reverseLength(ListNode* head, int size);
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2);
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
+    ListNode* addTwoNumbersRecursion(ListNode* l1, ListNode* l2);
 };
 
 class MyPriorityQueue{
@@ -435,8 +438,6 @@ ListNode* Solution::reverseList(ListNode* head) {
     }
     return pre;
 }
-
-
 bool Solution::isPalindrome(ListNode* head) {
     if(head == NULL || head->next == NULL) return true;
     ListNode *slow = head, *fast = head->next;
@@ -466,7 +467,6 @@ bool Solution::isPalindrome(ListNode* head) {
     slow->next = rightHead;
     return true;
 }
-
 void Solution::reverseLength(ListNode *head, int size) {
     ListNode* pre = NULL;
     ListNode* cur = head;
@@ -477,4 +477,38 @@ void Solution::reverseLength(ListNode *head, int size) {
         pre = cur;
         cur = tmp;
     }    
+}
+ListNode* Solution::mergeTwoLists(ListNode* list1, ListNode* list2){
+    if(list1 == NULL) return list2;
+    if(list2 == NULL) return list1;
+    if(list1->val >= list2->val){
+        list2->next = mergeTwoLists(list1, list2->next);
+        return list2;
+    }
+    else{
+        list1->next = mergeTwoLists(list1->next, list2);
+        return list1;
+    }
+}
+ListNode* Solution::addTwoNumbers(ListNode* l1, ListNode* l2){
+    ListNode* head = addTwoNumbersRecursion(l1, l2);
+    int carry = 0;
+    ListNode* cur = head;
+    while(cur->next){
+        int tmp = cur->val;
+        cur->val = (cur->val + carry) % 10;
+        carry = tmp / 10;
+    }
+    if(cur->val + carry >= 10){
+        cur->next = new ListNode((cur->val + carry) / 10);
+        cur->val = (cur->val + carry) % 10;
+    }
+    return head;
+}
+ListNode* Solution::addTwoNumbersRecursion(ListNode* l1, ListNode* l2){
+    if(l1 == NULL) return l2;
+    if(l2 == NULL) return l1;
+    l1->val = l1->val + l2->val;
+    l1->next = addTwoNumbersRecursion(l1->next, l2->next);
+    return l1;
 }
