@@ -44,7 +44,9 @@ public:
     bool isPalindrome(ListNode *head);
     void reverseLength(ListNode* head, int size);
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2);
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
+    bool hasCycle(ListNode *head);
+    ListNode *detectCycle(ListNode *head);
+    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2);
     ListNode* addTwoNumbersRecursion(ListNode* l1, ListNode* l2);
 };
 
@@ -489,6 +491,34 @@ ListNode* Solution::mergeTwoLists(ListNode* list1, ListNode* list2){
         list1->next = mergeTwoLists(list1->next, list2);
         return list1;
     }
+}
+bool Solution::hasCycle(ListNode *head){
+    if(head == NULL || head->next == NULL) return false;
+    ListNode *slow = head, *fast = head->next;
+    while(fast->next && fast->next->next){
+        slow = slow->next;
+        fast = fast->next->next;
+        if(fast == slow) return true;
+    }
+    return false;
+}
+ListNode* Solution::detectCycle(ListNode *head) {
+    if(head == NULL) return NULL;
+    ListNode *low = head, *fast = head;
+    while(fast->next && fast->next->next){
+        low = low->next;
+        fast = fast->next->next;
+        if(low == fast) break;
+    }
+    if(fast->next && fast->next->next){
+        ListNode* ans = head; 
+        while(ans != low){
+            ans = ans->next;
+            low = low->next;
+        }
+        return ans;
+    }
+    return NULL;
 }
 ListNode* Solution::addTwoNumbers(ListNode* l1, ListNode* l2){
     ListNode* head = addTwoNumbersRecursion(l1, l2);
