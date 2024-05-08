@@ -2,6 +2,8 @@
 #include <queue>
 #include <array>
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
@@ -449,33 +451,88 @@ public:
 class Solution_827 {
 private:
     int dirs[4][2] = {0, 1, 0, -1, 1, 0, -1, 0};
-    int dfs(vector<vector<int>>& grid, vector<vector<bool>> visited, int x, int y, bool built){
-        if(visited[x][y]) return 0;
+    void dfs(vector<vector<int>>& grid, vector<vector<bool>>& visited, int x, int y, int mark, int& count){
         visited[x][y] = true;
-        int ans = 0;
+        count++;
+        grid[x][y] = mark;
         for(auto dir : dirs){
             int nextx = x + dir[0], nexty = y + dir[1];
-            if(nextx < 0 || nextx > grid.size() || nexty < 0 || nexty >= grid[0].size()) continue;
-            if(grid[nextx][nexty] == 1) ans = max(ans, dfs(grid, visited, nextx, nexty, built));
-            else if(!built) ans = max(ans, dfs(grid, visited, nextx, nexty, true));
+            if(nextx < 0 || nextx >= grid.size() || nexty < 0 || nexty >= grid[0].size()) continue;
+            if(visited[nextx][nexty] || grid[nextx][nexty] == 0) continue;
+            dfs(grid, visited, nextx, nexty, mark, count);
         }
-        if(built) visited[x][y] = false;
-        return ans;
     }
 public:
     int largestIsland(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<bool>> visited(grid.size(), vector<bool>(grid[0].size(), false));
+        unordered_map<int, int> gridNum;
+        int mark = 2;
+        bool isAllGrid = true;
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(grid[i][j] == 0) isAllGrid = false;
+                if(!visited[i][j] && grid[i][j] == 1){
+                    int count = 0;
+                    dfs(grid, visited, i, j, mark, count);
+                    gridNum[mark++] = count;
+                }
+            }
+        }
+        if(isAllGrid) return m * n;
+        int res = 0;
+        unordered_set<int> visitedGrid;
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                int count = 1;
+                visitedGrid.clear();
+                if(grid[i][j] == 0){
+                    for(auto dir : dirs){
+                        int nextx = i + dir[0], nexty = j + dir[1];
+                        if(nextx < 0 || nextx >= m || nexty < 0 || nexty >= n) continue;
+                        if(visitedGrid.find(grid[nextx][nexty]) != visitedGrid.end()) continue;
+                        count += gridNum[grid[nextx][nexty]];
+                        visitedGrid.emplace(grid[nextx][nexty]);
+                    }
+                }
+                res = max(res, count);
+            }
+        }
+        return res;
+    }
+};
 
+class Solution_127 {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        // 转换为set，提高查询速度
+        unordered_set<string> wordSet(wordList.begin(), wordList.end());
+        if(wordSet.find(endWord) == wordSet.end()) return 0;
+        unordered_map<string, int> visitMap;
+        queue<string> que;
+        que.push(beginWord);
+        visitMap.insert(pair<string, int>(beginWord, 1));
+        while(!que.empty()){
+            string word = que.front(); que.pop();
+            int path = visitMap[word];
+            for(int i = 0; i < word.length(); i++){
+                string newWord = word;
+                for(int j = 0; j < 26; j++){
+                    newWord[i] = 'a' + j;
+                    if(newWord == endWord) return path + 1;
+                    if(visitMap.find(newWord) == visitMap.end() && wordSet.find(newWord) != wordSet.end()){
+                        visitMap.insert(pair<string, int>(newWord, path + 1));
+                        que.push(newWord);
+                    }
+                }
+            }
+        }
+        return 0;
     }
 };
 
 int main(){
-    vector<vector<char>> grid = {{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'O', 'X'}, {'X', 'O', 'X', 'X'}};
-    Solution_130_dfs s;
-    s.solve(grid);
-    for(int i = 0; i < 4; i++){
-        for(int j = 0; j < 4; j++){
-            cout << grid[i][j] << ' ';
-        }
-        cout << endl;
-    }
+    vector<vector<int>> grid = {{1, 0}, {0, 1}};
+    Solution_827 s;
+    cout << s.largestIsland(grid);
 }
