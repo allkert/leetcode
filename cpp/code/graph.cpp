@@ -446,6 +446,28 @@ public:
     }
 };
 
+class Solution_827 {
+private:
+    int dirs[4][2] = {0, 1, 0, -1, 1, 0, -1, 0};
+    int dfs(vector<vector<int>>& grid, vector<vector<bool>> visited, int x, int y, bool built){
+        if(visited[x][y]) return 0;
+        visited[x][y] = true;
+        int ans = 0;
+        for(auto dir : dirs){
+            int nextx = x + dir[0], nexty = y + dir[1];
+            if(nextx < 0 || nextx > grid.size() || nexty < 0 || nexty >= grid[0].size()) continue;
+            if(grid[nextx][nexty] == 1) ans = max(ans, dfs(grid, visited, nextx, nexty, built));
+            else if(!built) ans = max(ans, dfs(grid, visited, nextx, nexty, true));
+        }
+        if(built) visited[x][y] = false;
+        return ans;
+    }
+public:
+    int largestIsland(vector<vector<int>>& grid) {
+
+    }
+};
+
 int main(){
     vector<vector<char>> grid = {{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'O', 'X'}, {'X', 'O', 'X', 'X'}};
     Solution_130_dfs s;
