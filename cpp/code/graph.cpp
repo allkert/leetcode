@@ -531,8 +531,83 @@ public:
     }
 };
 
+class Solution_841 {
+private:
+    void bfs(vector<vector<int>>& rooms, vector<bool>& visited, int roomIndex){
+        visited[roomIndex] = true;
+        queue<int> que;
+        que.push(roomIndex);
+        while(!que.empty()){
+            int room = que.front(); que.pop();
+            for(int key : rooms[room]){
+                if(!visited[key]){
+                    visited[key] = true;
+                    que.push(key);
+                }
+            }
+        }
+    }
+
+    void dfs(vector<vector<int>>& rooms, vector<bool>& visited, int roomIndex){
+        visited[roomIndex] = true;
+        for(int key : rooms[roomIndex]){
+            if(!visited[key]){
+                dfs(rooms, visited, key);
+            }
+        }
+    }
+public:
+    bool canVisitAllRooms(vector<vector<int>>& rooms) {
+        vector<bool> visited = vector<bool>(rooms.size(), false);
+        bfs(rooms, visited, 0);
+        for(bool v : visited){
+            if(!v) return false;
+        }
+        return true;
+    }
+};
+
+class Solution_463 {
+public:
+    int islandPerimeter(vector<vector<int>>& grid) {
+        int sum = 0;
+        int cover = 0;
+        for(int i = 0; i < grid.size(); i++){
+            for(int j = 0; j < grid[0].size(); j++){
+                if(grid[i][j]){
+                    sum++;
+                    if(i - 1 >= 0 && grid[i-1][j]) cover++;
+                    if(j - 1 >= 0 && grid[i][j-1]) cover++;
+                }
+            }
+        }
+        return 4 * sum - 2 * cover;
+    }
+};
+
+class Solution_1971{
+private:
+    int n = 2 * 10e4 + 5;
+    vector<int> father = vector<int> (n, 0);
+    void init(){
+        for(int i = 0; i < n; i++) father[i] = i;
+    }
+    int find(int u){
+        return u == father[u]? u : father[u] = find(father[u]);
+    }
+public:
+    void test(){
+        init();
+        father[1] = 2;
+        father[2] = 3;
+        cout << find(1);
+        cout << father[1];
+    }
+};
+
+
+
 int main(){
-    vector<vector<int>> grid = {{1, 0}, {0, 1}};
-    Solution_827 s;
-    cout << s.largestIsland(grid);
+    Solution_1971 s;
+    s.test();
 }
