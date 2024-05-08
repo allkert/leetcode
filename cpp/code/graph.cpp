@@ -336,8 +336,8 @@ public:
         }
         for(int i = 0; i < row; i++){
             for(int j = 0; j < col; j++){
-                if(board[i][j] == 'A') board[i][j] == 'O';
-                if(board[i][j] == 'O') board[i][j] == 'X';
+                if(board[i][j] == 'A') board[i][j] = 'O';
+                else if(board[i][j] == 'O') board[i][j] = 'X';
             }
         }
     }
@@ -353,8 +353,107 @@ private:
     }
 };
 
+class Solution_130_bfs{
+private:
+    int dirs[4][2] = {0, 1, 0, -1, 1, 0, -1, 0};
+    void bfs(vector<vector<char>>& board, int x, int y){
+        queue<pair<int, int>> que;
+        que.push({x, y});
+        board[x][y] = 'A';
+        while(!que.empty()){
+            pair<int, int> cur = que.front(); que.pop();
+            for(auto dir : dirs){
+                int nextx = cur.first + dir[0];
+                int nexty = cur.second + dir[1];
+                if(nextx < 0 || nextx >= board.size() || nexty < 0 || nexty >= board[0].size()) continue;
+                if(board[nextx][nexty] != 'O') continue;
+                que.push({nextx, nexty});
+                board[nextx][nexty] = 'A';
+            }
+        }
+    }
+public:
+    void solve(vector<vector<char>>& board){
+        int m = board.size(), n = board[0].size();
+        for(int i = 0; i < m; i++){
+            if(board[i][0] == 'O') bfs(board, i, 0);
+            if(board[i][n-1] == 'O') bfs(board, i, n-1);
+        }
+        for(int j = 0; j < n; j++){
+            if(board[0][j] == 'O') bfs(board, 0, j);
+            if(board[m-1][j] == 'O') bfs(board, m-1, j);
+        }
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(board[i][j] == 'A') board[i][j] = 'O';
+                else if(board[i][j] == 'O') board[i][j] = 'X';
+            }
+        }
+    }
+};
+
+class Solution_417 {
+private:
+    int dirs[4][2] = {0, 1, 0, -1, 1, 0, -1, 0};
+    void dfs(vector<vector<int>>& heights, vector<vector<bool>>& visited, int x, int y){
+        if(visited[x][y]) return;
+        visited[x][y] = true;
+        visited[x][y] = true;
+        for(auto dir : dirs){
+            int nextx = x + dir[0], nexty = y + dir[1];
+            if(nextx < 0 || nextx >= heights.size() || nexty < 0 || nexty >= heights[0].size()) continue;
+            if(heights[nextx][nexty] < heights[x][y]) continue;
+            dfs(heights, visited, nextx, nexty);
+        }
+    }
+
+    void bfs(vector<vector<int>>& heights, vector<vector<bool>>& visited, int x, int y){
+        if(visited[x][y]) return;
+        visited[x][y] = true;
+        queue<pair<int, int>> que;
+        que.push({x, y});
+        while(!que.empty()){
+            auto cur = que.front(); que.pop();
+            for(auto dir : dirs){
+                int nextx = cur.first + dir[0], nexty = cur.second + dir[1];
+                if(nextx < 0 || nextx >= heights.size() || nexty < 0 || nexty >= heights[0].size()) continue;
+                if(heights[nextx][nexty] < heights[cur.first][cur.second] || visited[nextx][nexty]) continue;
+                visited[nextx][nexty] = true;
+                que.push({nextx, nexty});
+            }
+        }
+    }
+public:
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        int m = heights.size(), n = heights[0].size();
+        vector<vector<bool>> pacificOcean(m, vector<bool>(n, false));
+        vector<vector<bool>> atlanticOcean(m, vector<bool>(n, false));
+        vector<vector<int>> res;
+        for(int i = 0; i < m; i++){
+            dfs(heights, pacificOcean, i, 0);
+            dfs(heights, atlanticOcean, i, n-1);
+        }
+        for(int j = 0; j < n; j++){
+            dfs(heights, pacificOcean, 0, j);
+            dfs(heights, atlanticOcean, m-1, j);
+        }
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(pacificOcean[i][j] && atlanticOcean[i][j]) res.push_back({i, j});
+            }
+        }
+        return res;
+    }
+};
+
 int main(){
-    vector<vector<int>> grid = {{0, 1, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}};
-    Solution_1020_bfs s;
-    cout << s.numEnclaves(grid);
+    vector<vector<char>> grid = {{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'O', 'X'}, {'X', 'O', 'X', 'X'}};
+    Solution_130_dfs s;
+    s.solve(grid);
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+            cout << grid[i][j] << ' ';
+        }
+        cout << endl;
+    }
 }
