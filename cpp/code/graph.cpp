@@ -595,19 +595,56 @@ private:
     int find(int u){
         return u == father[u]? u : father[u] = find(father[u]);
     }
+    bool isSame(int u, int v){
+        return find(u) == find(v);
+    }
+
+    void join(int u, int v){
+        u = find(u);
+        v = find(v);
+        if(u != v) father[v] = u;
+    }
+
 public:
-    void test(){
+    bool validPath(int n, vector<vector<int>>& edges, int source, int destination){
         init();
-        father[1] = 2;
-        father[2] = 3;
-        cout << find(1);
-        cout << father[1];
+        for(int i = 0; i < edges.size(); i++){
+            join(edges[i][1], edges[i][0]);
+        }
+        return isSame(source, destination);
     }
 };
 
+class Solution_684{
+private:
+    int n = 1005;
+    vector<int> father = vector<int> (n, 0);
+    void init(){
+        for(int i = 0; i < n; i++) father[i] = i;
+    }
+    int find(int u){
+        return u == father[u]? u : father[u] = find(father[u]);
+    }
+    bool isSame(int u, int v){
+        return find(u) == find(v);
+    }
 
+    void join(int u, int v){
+        u = find(u);
+        v = find(v);
+        if(u != v) father[v] = u;
+    }
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        init();
+        for(auto edge : edges){
+            if(isSame(edge[0], edge[1])) return edge;
+            else join(edge[0], edge[1]);
+        }
+        return {};
+    }
+};
 
 int main(){
     Solution_1971 s;
-    s.test();
 }
