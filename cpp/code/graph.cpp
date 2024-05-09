@@ -645,6 +645,75 @@ public:
     }
 };
 
+class Solution_685{
+private:
+    static const int N = 1010;
+    vector<int> father = vector<int>(N, 0);
+    int n;//边的数量（不算额外的一条边）， 有n个边，就有n+1个节点。即N = n + 1。
+    void init(){
+        for(int i = 0; i <= n; i++){
+            father[i] = i;
+        }
+    }
+
+    int find(int u){
+        return u == father[u]? u : father[u] = find(father[u]);
+    }
+
+    bool isSame(int u, int v){
+        return find(u) == find(v);
+    }
+
+    void join(int u, int v){
+        u = father[u];
+        v = father[v];
+        if(u != v) father[v] = u;
+    }
+
+    vector<int> getRemoveEdge(const vector<vector<int>>& edges){
+        init();
+        for(auto edge : edges){
+            if(isSame(edge[0], edge[1])) return edge;
+            join(edge[0], edge[1]);
+        }
+        return {};
+    }
+
+    bool isTreeAfterRemoveEdge(const vector<vector<int>>& edges, int deleteEdge){
+        init();
+        for(int i = 0; i < n; i++){
+            if(i == deleteEdge) continue;
+            if(isSame(edges[i][0], edges[i][1])) return false;
+            join(edges[i][0], edges[i][1]);
+        }
+        return true;
+    }
+
+public:
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges){
+        int inDegree[N] = {0};
+        n = edges.size();
+        for(int i = 0; i < n; i++){
+            inDegree[edges[i][1]]++;//统计入度
+        }
+        // 记录入度为2的边
+        vector<int> vec;
+        for(int i = n - 1; i >= 0; i--){
+            // i 是边的序号
+            if(inDegree[edges[i][1]] == 2) vec.push_back(i);
+        }
+
+        // 如果有入度为2的节点，那么有且只有一个， 对于vec里面存储了两条边
+        if(vec.size() > 0){
+            if(isTreeAfterRemoveEdge(edges, vec[0])) return edges[vec[0]];
+            return edges[vec[1]];
+        }
+
+        // 如果没有入度为2的边，那么一定有环，找到成环的那条边就可以了
+        return getRemoveEdge(edges);
+    }  
+};
+
 int main(){
     Solution_1971 s;
 }
