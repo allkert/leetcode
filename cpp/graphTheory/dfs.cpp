@@ -3,6 +3,7 @@
 #include<iostream>
 #include<algorithm>
 #include <array>
+#include <unordered_set>
 
 using namespace std;
 
@@ -70,6 +71,39 @@ public:
 
 class Solution_2316 {
 private:
+    int dfs(vector<vector<int>> &graph, int cur, vector<bool>& visited){
+        visited[cur] = true;
+        int size = 1;
+        for(int i = 0; i < graph[cur].size(); i++){
+            if(!visited[graph[cur][i]]){
+                size += dfs(graph, graph[cur][i], visited);
+            }
+        }
+        return size;
+    }
+public:
+    long long countPairs(int n, vector<vector<int>>& edges) {
+        vector<vector<int>> graph = vector<vector<int>>(n, vector<int>());
+        for(auto edge : edges){
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+        int preTotalNodes = 0;
+        long long ans = 0;
+        vector<bool> visited = vector<bool>(n, false);
+        for(int i = 0; i < n; i++){
+            if(!visited[i]){
+                int size = dfs(graph, i, visited);
+                ans += (long long)size * preTotalNodes;
+                preTotalNodes += size;
+            }
+        }
+        return ans;
+    }
+};
+
+class solution_1319{
+private:
     int n = 10e5+5;
     vector<int> father = vector<int>(n, 0);
     void init(){
@@ -89,12 +123,31 @@ private:
         if(u != v) father[v] = u;
     }
 public:
-    long long countPairs(int n, vector<vector<int>>& edges) {
-        
+    int makeConnected(int n, vector<vector<int>>& connections) {
+        int extraNum = 0;
+        int res = 0;
+        int groupNum = 0;
+        unordered_set<int> uset;
+        init();
+        for(auto connect : connections){
+            if(isSame(connect[0], connect[1])){
+                extraNum++;
+            }
+            join(connect[0], connect[1]);
+        }
+        for(int i = 0; i < n; i++){
+            int root = find(i);
+            if(uset.find(root) == uset.end()){
+                groupNum++;
+                uset.emplace(root);
+            }
+        }
+        cout << groupNum;
+        return extraNum + 1 >= groupNum? groupNum - 1 : -1;
     }
 };
 
 int main(){
-    array<array<int, 2>, 4>* dirs = new array<array<int, 2>, 4>({1, 0, -1, 0, 0, 1, 0, -1});
-    cout << (dirs->at(0))[0];
+    solution_1319 s;
+    vector<vector<int>> edges({{0, 2}, {0, 5}, {2, 4}, {1, 6}, {4, 5}});
 }
