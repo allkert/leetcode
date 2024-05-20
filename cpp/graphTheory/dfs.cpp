@@ -296,7 +296,7 @@ public:
 /* 按照一定的顺序访问输出有向无环图的所有节点，每个节点只能输出一次，并且如果一个节点是另一个节点的前驱节点，那么前驱节点一定在前面 
     只有有向无环图才有拓扑排序 */
 // 2192. 有向无环图中一个节点的所有祖先
-class Solution_2192 {
+class Solution_2192_ref {
 public:
     vector<vector<int>> getAncestors(int n, vector<vector<int>>& edges){
         // 节点的祖先集合
@@ -309,6 +309,14 @@ public:
             e[edge[0]].push_back(edge[1]);
             indeg[edge[1]]++;
         }  
+        // bfs
+        queue<int> q;
+        // 所有入度为0的节点
+        for(int i = 0; i < n; i++){
+            if(indeg[i] == 0){
+                q.push(i);
+            }
+        }
     }
 };
 
