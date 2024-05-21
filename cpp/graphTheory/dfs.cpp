@@ -4,6 +4,7 @@
 #include<algorithm>
 #include <array>
 #include <unordered_set>
+#include <functional>
 
 using namespace std;
 
@@ -296,7 +297,8 @@ public:
 /* 按照一定的顺序访问输出有向无环图的所有节点，每个节点只能输出一次，并且如果一个节点是另一个节点的前驱节点，那么前驱节点一定在前面 
     只有有向无环图才有拓扑排序 */
 // 2192. 有向无环图中一个节点的所有祖先
-class Solution_2192_ref {
+// bfs方法
+class Solution_2192_ref_1 {
 public:
     vector<vector<int>> getAncestors(int n, vector<vector<int>>& edges){
         // 节点的祖先集合
@@ -317,8 +319,53 @@ public:
                 q.push(i);
             }
         }
+        while(!q.empty()){
+            int u = q.front();q.pop();
+            for(int v : e[u]){
+                // u是v的直接祖先
+                anc[v].insert(u);
+                // i是u的所有祖先，所以也即v的所有间接祖先（当然也可能包含一些直接祖先）
+                for(int i : anc[u]){
+                    anc[v].insert(i);
+                }
+                indeg[v]--;
+                if(indeg[v] == 0) q.push(v);
+            }
+        }
+        vector<vector<int>> res(n);
+        for(int i = 0; i < n; i++){
+            for(int node : anc[i]){
+                res[i].push_back(node);
+            }
+            sort(res[i].begin(), res[i].end());
+        }
+        return res;
+    }
+};  
+
+// 把所有的边反向，然后dfs，能搜到的都是自己的祖先
+class solution_2192_reverse_dfs{
+public:
+    vector<vector<int>> getAncestors(int n, vector<vector<int>> &edges){
+        vector<vector<int>> graph(n);
+        vector<vector<int>> ans;
+        vector<bool> visited(n, false);
+        for(auto& edge : edges){
+            graph[edge[1]].push_back(edge[0]);
+        }
+        function<void(int)> dfs = [&](int x){
+            visited[x] = true;
+            for(int y : graph[x]){
+                if(!visited[y]) dfs(y);
+            }
+        };
+
+        for(int i = 0; i < n; i++){
+            visited
+        }
     }
 };
+
 
 int main(){
     solution_2492_dju s;
