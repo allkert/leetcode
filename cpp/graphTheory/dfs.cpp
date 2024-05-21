@@ -5,6 +5,9 @@
 #include <array>
 #include <unordered_set>
 #include <functional>
+#include <unordered_map>
+#include <set>
+#include <math.h>
 
 using namespace std;
 
@@ -372,6 +375,7 @@ public:
     }
 };  
 
+// 924. 尽量减少恶意软件的传播
 class solution_924_my{
 public:
     int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
@@ -381,8 +385,10 @@ public:
         function<int(int)> dfs = [&](int node) -> int {
             visited[node] = start;
             int areaNum = 1;
-            for(int nnode : graph[node]){
-                if(!visited[nnode]) areaNum += dfs(nnode);
+            for(int i = 0; i < nodeNum; i++){
+                if(!visited[i] && graph[node][i] == 1){
+                    areaNum += dfs(i);
+                }
             }
             return areaNum;
         };
@@ -396,21 +402,120 @@ public:
                 start++;
             }
         }
+        int ans = nodeNum;
+        int areaNodeNum = 0;
 
-        int ans = 0;
 
-        vector<vector<int>> area_initial(start - 1);
+        vector<vector<int>> area_initial(start);
         for(int initialNode : initial){
             area_initial[visited[initialNode]].push_back(initialNode);
-        }
+        } 
 
-        
+
+        // 遍历所有区域，找到只包含一个初始感染节点的区域
+        for(int i = 1; i < start; i++){
+            if (area_initial[i].size() == 1){
+                cout << i << endl;
+                if(area[i] > areaNodeNum || (area[i] == areaNodeNum && area_initial[i][0] < ans)){
+                    areaNodeNum = area[i];
+                    ans = area_initial[i][0];
+                }
+            }
+            else if(areaNodeNum == 0){
+                for(int a : area_initial[i]){
+                    ans = min(ans, a);
+                }
+            }
+        }
+        return ans;
     }
 };
 
+class solution_924_ref{
+public:
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial){
+        // use vector to construct a set
+        set<int> st(initial.begin(), initial.end());
+        vector<int> vis(graph.size());
+        int ans = -1, max_size = 0, node_id, size;
+        // 状态机
+        // -1：初始状态
+        // 非负数x：表示第x个节点是唯一一个感染节点
+        // -2：表示有多个感染节点
+        function<void(int)> dfs = [&](int x){
+            vis[x] = 1;
+            size++;
+            if(node_id != -2 && st.count(x)){
+                node_id = node_id == -1? x : -2;
+            }
+            for(int y = 0; y < graph.size(); y++){
+                if(graph[x][y] && !vis[y]){
+                    dfs(y);
+                }
+            }
+        };
+
+        for(int x : initial){
+            if(vis[x]) continue;
+            node_id = -1;
+            size = 0;
+            dfs(x);
+            if(node_id >= 0 && (size > max_size || size == max_size && node_id < ans)){
+                ans = node_id;
+                max_size = size;
+            }
+        }
+        if(ans >= 0) return ans;
+        ans = INT_MAX;
+        for(int x : initial){
+            if(x < ans) ans = x;
+        }
+        return ans;
+    }
+};
+
+class solution_2101{
+private:
+    void bulidEdges(vector<vector<int>>& bombs, vector<vector<int>>& edges){
+        int bombNum = bombs.size();
+        // 建图
+        for(int i = 0; i < bombs.size(); i++){
+            for(int j = 0; j < bombs.size(); j++){
+                long delta_x = bombs[i][0] - bombs[j][0];
+                long delta_y = bombs[i][1] - bombs[j][1];
+                long r = bombs[i][2];
+                if(i != j && pow(delta_x, 2) + pow(delta_y, 2) <= r * r){
+                    edges[i].push_back(j);
+                }
+            }
+        }
+    }
+public:
+    int maximumDetonation(vector<vector<int>>& bombs) {
+        int size = 0;
+        int ans = 0;
+        vector<bool> visited(bombs.size(), false);
+        vector<vector<int>> edges(bombs.size());
+        bulidEdges(bombs, edges);
+        function<void(int)> dfs = [&](int x){
+            visited[x] = true;
+            size++;
+            for(auto y : edges[x]){
+                if(!visited[y]) dfs(y);
+            }
+        };
+        for(int i = 0; i < bombs.size(); i++){
+            size = 0;
+            fill(visited.begin(), visited.end(), false);
+            dfs(i);
+            ans = max(ans, size);
+        }
+        return ans;
+    }
+};
 
 int main(){
-    solution_2492_dju s;
-    vector<vector<int>> roads({{1, 2, 9}, {2, 3, 6}, {2, 4, 5}, {1, 4, 7}});
-    cout << s.minScore(4, roads);
+    solution_2101 s;
+    vector<vector<int>> graph = {{2, 1, 3}, {6, 1, 4}};
+    cout << s.maximumDetonation(graph);
 }
