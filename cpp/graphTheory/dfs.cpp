@@ -361,8 +361,14 @@ public:
         };
 
         for(int i = 0; i < n; i++){
-            visited
+            fill(visited.begin(), visited.end(), false);
+            dfs(i);
+            visited[i] = false;
+            for(int j = 0; j < n; j++){
+                if(visited[j]) ans[i].push_back(j);
+            }
         }
+        return ans;
     }
 };
 
