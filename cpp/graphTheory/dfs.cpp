@@ -370,6 +370,42 @@ public:
         }
         return ans;
     }
+};  
+
+class solution_924_my{
+public:
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+        int nodeNum = graph.size();
+        vector<int> visited(nodeNum);
+        int start = 1;
+        function<int(int)> dfs = [&](int node) -> int {
+            visited[node] = start;
+            int areaNum = 1;
+            for(int nnode : graph[node]){
+                if(!visited[nnode]) areaNum += dfs(nnode);
+            }
+            return areaNum;
+        };
+
+        // key：区域编号  value：这个区域的节点数量
+        unordered_map<int, int> area;
+        for(int i = 0; i < nodeNum; i++){
+            if(!visited[i]){
+                int tempNodeNum = dfs(i);
+                area.insert(pair<int, int>(start, tempNodeNum));
+                start++;
+            }
+        }
+
+        int ans = 0;
+
+        vector<vector<int>> area_initial(start - 1);
+        for(int initialNode : initial){
+            area_initial[visited[initialNode]].push_back(initialNode);
+        }
+
+        
+    }
 };
 
 
