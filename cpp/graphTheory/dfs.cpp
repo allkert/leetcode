@@ -557,13 +557,139 @@ public:
         function<bool(int)> dfs = [&](int x) -> bool{
             if(visited[x]) return false;
             visited[x] = true;
-            for(int y :)
+            for(int y : graph[x]){
+                // 如果dfs之后,发现这个节点不是一个安全节点,就保持这个节点的visited处在true的状态,返回false
+                // 这样的话在下一次的搜索过程中,如果还是遇到这个节点,就不用往下搜索了,肯定是不安全的,可以节省时间
+                if(!dfs(y)) return false;
+            }
+            // 一个节点是安全节点的充要条件是：节点不在一个环中 或者说其子节点都是安全节点
+            // 如果程序到了这里就可以确定这是一个安全节点
+            // 已经搜完了，所以这里要把这个节点的visited状态设置回false,否则下次搜的时候搜到这个节点发现visited是true直接返回false就错了
+            visited[x] = false;
+            // 其他人访问到这个节点的时候，就知道到达了一个安全节点，接着搜肯定是安全的,所以没必要接着往下搜了,所以重设一下graph[x]
+            graph[x] = {};
+            return true;
         };
+
+        for(int i = 0; i < n; i++){
+            if(dfs(i)) ans.push_back(i);
+        }
+        return ans;
+    }
+};  
+
+class solution_802_3{
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph){
+        int n = graph.size();
+        vector<vector<int>> reverseGraph(n);
+        vector<int> inDeg(n);
+        // 反向建图
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < graph[i].size(); j++){
+                reverseGraph[graph[i][j]].push_back(i);
+            }
+            inDeg[i] = graph[i].size();
+        }
+
+        // bfs
+        queue<int> que;
+        // 入度为0的节点都是安全节点
+        for(int i = 0; i < n; i++){
+            if(inDeg[i] == 0) que.push(i);
+        }
+
+        while(!que.empty()){
+            int node = que.front(); que.pop();
+            for(int post : reverseGraph[node]){
+                inDeg[post]--;
+                if(!inDeg[post]) que.push(post);
+            }
+        }
+
+        vector<int> ans;
+        for(int i = 0; i < n; i++){
+            if(!inDeg[i]) ans.push_back(i);
+        }
+        return ans;
+    }
+};  
+
+// 这是我的方法超时呢,肯定很复杂啦啦啦啦啦啦啦啦
+class solution_2092 {
+private: 
+    void buildGraph(vector<vector<int>>& meetings, vector<vector<int>>& graph, int& start){
+        fill(graph.begin(), graph.end(), vector<int>());
+        int time = meetings[start][2];
+        for( ; start < meetings.size() && meetings[start][2] == time; start++){
+            graph[meetings[start][0]].push_back(meetings[start][1]);
+            graph[meetings[start][1]].push_back(meetings[start][0]);
+        }
+    }
+public:
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson) {
+        // 按照会议时间进行排序
+        sort(meetings.begin(), meetings.end(), [&](const vector<int>& a, const vector<int>& b){return a[2] < b[2];});
+        vector<vector<int>> graph(n);
+        unordered_set<int> knowPerson = {0, firstPerson};
+        vector<int> visited(n, false);
+        function<void(int)> dfs = [&](int x){
+            visited[x] = true;
+            for(auto g : graph[x]){
+                if(!visited[g]) dfs(g);
+            }
+        };
+        int start = 0;
+        while(start < meetings.size()){
+            buildGraph(meetings, graph, start);
+            fill(visited.begin(), visited.end(), false);
+            for(int p : knowPerson){
+                if(!visited[p]) dfs(p);
+            }
+            for(int i = 0; i < n; i++){
+                if(visited[i]) knowPerson.insert(i);
+            }
+        }
+        return vector<int>(knowPerson.begin(), knowPerson.end());
     }
 };
 
+class solution_2092_ref_dfs{
+public:
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson) {
+        // 按照会议时间进行排序
+        sort(meetings.begin(), meetings.end(), [&](const vector<int>& a, const vector<int>& b){return a[2] < b[2];});
+        unordered_set<int> knowPerson = {0, firstPerson};
+        for(int i = 0; i < meetings.size(); ){
+            unordered_map<int, vector<int>> g;
+            int time = meetings[i][2];
+            for( ; i < meetings.size() && meetings[i][2] == time; i++){
+                g[meetings[i][0]].push_back(meetings[i][1]);
+                g[meetings[i][1]].push_back(meetings[i][0]);
+            }
+            function<void(int)> dfs = [&](int v){
+                knowPerson.insert(v);
+                for(int& w : g[v]){
+                    if(!knowPerson.count(w)) dfs(w);
+                }
+            };
+            for(auto & [key, _] : g){
+                if(knowPerson.count(key)) dfs(key);
+            }
+        }
+        return vector<int>(knowPerson.begin(), knowPerson.end());
+    }
+};  
+
+class solution_2092_ref_bfs{
+
+};
+
 int main(){
-    solution_2101 s;
-    vector<vector<int>> graph = {{2, 1, 3}, {6, 1, 4}};
-    cout << s.maximumDetonation(graph);
+    solution_2092 s;
+    vector<vector<int>> meetings = {{2, 3, 8}, {1, 2, 5}, {1, 5, 10}};
+    vector<int> ans = s.findAllPeople(6, meetings, 1);
+    for(auto x : ans){
+        cout << x << ' ';
+    }
 }
