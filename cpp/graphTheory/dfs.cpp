@@ -512,6 +512,54 @@ public:
         }
         return ans;
     }
+}; 
+
+// 802. 找到最终的安全状态
+// 使用多个颜色标记节点的状态
+/* 
+    0：未访问
+    1: 访问过的结点
+    2：安全结点
+ */
+class sloution_802_1{
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph){
+        int n = graph.size();
+        vector<int> color(n);
+
+        function<bool(int)> dfs = [&](int x) -> bool{
+            if(color[x] > 0){
+                return color[x] == 2;                                   
+            }
+            color[x] = 1;
+            for(int y : graph[x]){
+                if(!dfs(y)) return false;
+            }
+            color[x] = 2;
+            return true;
+        };
+
+        vector<int> ans;
+        for(int i = 0; i < n; i++){
+            if(dfs(i)) ans.push_back(i);
+        }
+
+        return ans;
+    }
+};  
+
+class solution_802_2{
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph){
+        int n = graph.size();
+        vector<bool> visited(n);
+        vector<int> ans;
+        function<bool(int)> dfs = [&](int x) -> bool{
+            if(visited[x]) return false;
+            visited[x] = true;
+            for(int y :)
+        };
+    }
 };
 
 int main(){
