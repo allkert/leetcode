@@ -682,7 +682,50 @@ public:
 };  
 
 class solution_2092_ref_bfs{
+public:
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson){
+        int m = meetings.size();
+        sort(meetings.begin(), meetings.end(), [&](const auto& x, const auto& y){return x[2] < y[2];});
+        // 用于记录每个人是否知道秘密
+        vector<int> secret(n, 0);
+        secret[0] = secret[firstPerson] = true;
 
+        unordered_set<int> vertices;
+        unordered_map<int, vector<int>> edges;
+        for(int i = 0; i < m;){
+            int time = meetings[i][2];
+            vertices.clear();
+            edges.clear();
+            for(; i < m && meetings[i][2] == time; i++){
+                vertices.insert(meetings[i][0]);
+                vertices.insert(meetings[i][1]);
+                edges[meetings[i][0]].push_back(meetings[i][1]);
+                edges[meetings[i][1]].push_back(meetings[i][0]);
+            }
+
+            queue<int> que;
+            for(int person : vertices){
+                if(secret[person]) que.push(person);
+            }
+
+            while(!que.empty()){
+                int p = que.front(); que.pop();
+                for(int v : edges[p]){
+                    if(!secret[v]){
+                        secret[v] = 1;
+                        que.push(v);
+                    }
+                }
+            }
+        }
+
+        vector<int> res;
+        for(int i = 0; i < n; i++){
+            if(secret[i]) res.push_back(i);
+        }
+
+        return res;
+    }
 };
 
 int main(){
@@ -693,3 +736,4 @@ int main(){
         cout << x << ' ';
     }
 }
+
