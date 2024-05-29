@@ -124,9 +124,106 @@ public:
 
         return ans;
     }
+};   
+
+class solution_1129_my{
+public:
+    vector<int> shortestAlternatingPaths(int n, vector<vector<int>>& redEdges, vector<vector<int>>& blueEdges) {
+        vector<vector<vector<int>>> graph(2, vector<vector<int>>(n));
+        for(auto &e : redEdges){
+            graph[0][e[0]].push_back(e[1]);
+        }
+        for(auto &e : blueEdges){
+            graph[1][e[0]].push_back(e[1]);
+        }
+        queue<pair<int, bool>> que;
+        que.push({0, true});
+        que.push({0, false});
+        vector<vector<int>> dis(2, vector<int>(n, INT_MAX));
+        dis[0][0] = dis[1][0] = 0;
+        while(!que.empty()){
+            auto [node, isRed] = que.front(); que.pop();
+            if(isRed){
+                for(auto u : graph[1][node]){
+                    if(dis[1][u] == INT_MAX){
+                        dis[1][u] = dis[0][node] + 1;
+                        que.push({u, false});
+                    }
+                }
+            }
+            else{
+                for(auto v : graph[0][node]){
+                    if(dis[0][v] == INT_MAX){
+                        dis[0][v] = dis[1][node] + 1;
+                        que.push({v, true});
+                    }
+                }
+            }
+        }
+        vector<int> ans(n);
+        for(int i = 0; i < n; i++){
+            ans[i] = min(dis[0][i], dis[1][i]);
+            if(ans[i] == INT_MAX) ans[i] = -1;
+        }
+        return ans;
+    }    
+};  
+
+class solution_1298 {
+public:
+    int maxCandies(vector<int>& status, vector<int>& candies, vector<vector<int>>& keys, vector<vector<int>>& containedBoxes, vector<int>& initialBoxes){
+        int n = status.size();
+        vector<bool> haskey(n, false);
+        vector<bool> hasbox(n, false);
+        vector<bool> vis(n, false);
+        queue<int> boxs;
+        int candy = 0; 
+        // 寻找可以打开的盒子，即有钥匙的盒子，但是此时不一定可以直接打开，因为这个盒子可能在其他不能打开的盒子里面
+        for(int i = 0; i < n; i++){
+            if(status[i]) haskey[i] = true;
+        }
+        // 找目前可以获取到的盒子
+        for(auto b : initialBoxes){
+            hasbox[b] = true;
+        }
+        // 找可以直接打开的盒子
+        for(int i = 0; i < n; i++){
+            if(hasbox[i] && haskey[i]){
+                vis[i] = true;
+                boxs.push(i);
+            }
+        }
+        while(!boxs.empty()){
+            int box = boxs.front(); boxs.pop();
+            // 拿糖果
+            candy += candies[box];
+            // 拿盒子
+            for(auto u : containedBoxes[box]){
+                hasbox[u] = true;
+                if(haskey[u]){
+                    boxs.push(u);
+                    vis[u] = true; 
+                }
+            }
+            // 拿钥匙
+            for(auto k : keys[box]){
+                haskey[k] = true;
+                if(hasbox[k] && !vis[k]){
+                    boxs.push(k);
+                    vis[k] = true;
+                }
+            }
+        }
+        return candy;
+    }
 };
 
 int main(){
-    bool T = "ABCD" < "ABCE";
-    cout << T;
+    solution_1298 s;
+    vector<int> status = {1, 0, 1, 0};
+    vector<int> candies = {7,5,4,100};
+    vector<vector<int>> keys = {{},{},{1},{}};
+    vector<vector<int>> containedBoxes = {{1,2},{3},{},{}};
+    vector<int> initialBoxes = {0};
+    cout << s.maxCandies(status, candies, keys, containedBoxes, initialBoxes);
 }
