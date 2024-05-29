@@ -46,9 +46,9 @@ public:
         }
         return ans;
     }
-};  
+};
 
-class soution_1311_ref{
+class solution_1311_ref{
 public:
     vector<string> watchedVideosByFriends(vector<vector<string>>& watchedVideos, vector<vector<int>>& friends, int id, int level){
         int n = friends.size();
@@ -86,7 +86,7 @@ public:
         }
         return ans;
     }
-};
+}; 
 
 class solution_1129{
 public:
