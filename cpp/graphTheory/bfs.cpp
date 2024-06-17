@@ -107,7 +107,8 @@ public:
         q.push({0, 0});
         q.push({0, 1});
         while(!q.empty()){
-            auto [x, t] = q.front(); q.pop();
+            pair<int, int> cur = q.front(); q.pop();
+            int x = cur.first, t = cur.second;
             for(auto y : next[1-t][x]){
                 if(dist[1-t][y] == INT_MAX){
                     dist[1 - t][y] = dist[t][x] + 1;
@@ -142,7 +143,9 @@ public:
         vector<vector<int>> dis(2, vector<int>(n, INT_MAX));
         dis[0][0] = dis[1][0] = 0;
         while(!que.empty()){
-            auto [node, isRed] = que.front(); que.pop();
+            pair<int, bool> cur = que.front(); que.pop();
+            int node = cur.first; 
+            bool isRed = cur.second;
             if(isRed){
                 for(auto u : graph[1][node]){
                     if(dis[1][u] == INT_MAX){
@@ -185,14 +188,12 @@ public:
         // 找目前可以获取到的盒子
         for(auto b : initialBoxes){
             hasbox[b] = true;
-        }
-        // 找可以直接打开的盒子
-        for(int i = 0; i < n; i++){
-            if(hasbox[i] && haskey[i]){
-                vis[i] = true;
-                boxs.push(i);
+            if(haskey[b]){
+                boxs.push(b);
+                vis[b] = true;
             }
         }
+
         while(!boxs.empty()){
             int box = boxs.front(); boxs.pop();
             // 拿糖果
@@ -216,14 +217,124 @@ public:
         }
         return candy;
     }
+};  
+
+class solution_1298_ref{
+    int maxCandies(vector<int>& status, vector<int>& candies, vector<vector<int>>& keys, vector<vector<int>>& containedBoxes, vector<int>& initialBoxes){
+        int n = status.size();
+        vector<bool> can_open(n), has_box(n), used(n);
+        // can_open表示可以打开的盒子，但是现在可能处在别的盒子里面，暂时不能打开
+        for(int i = 0; i < n; i++){
+            can_open[i] = (status[i] == 1);
+        }
+        queue<int> q;
+        int ans = 0;
+        for(int box : initialBoxes){
+            has_box[box] = true;
+            if(can_open[box]){
+                q.push(box);
+                used[box] = true;
+                ans += candies[box];
+            }
+        }
+
+        while(!q.empty()){
+            int big_box = q.front(); q.pop();
+            for(int key : keys[big_box]){
+                can_open[key] = true;
+                if(!used[key] && has_box[key]){
+                    q.push(key);
+                    used[key] = true;
+                    ans += candies[key];
+                }
+            }
+            for(int box : containedBoxes[big_box]){
+                has_box[box] = true;
+                if(!used[box] && can_open[box]){
+                    q.push(box);
+                    used[box] = true;
+                    ans += candies[box];
+                }
+            }
+        }
+        return ans;
+    }
+};  
+class solution_2039 {
+public:
+    int networkBecomesIdle(vector<vector<int>>& edges, vector<int>& patience) {
+        int n = patience.size();
+        vector<vector<int>> adj(n);
+        vector<bool> visited(n, false);
+        for(auto &e : edges){
+            adj[e[0]].push_back(e[1]);
+            adj[e[1]].push_back(e[0]);
+        }  
+
+        queue<int> que;
+        que.push(0);
+        visited[0] = true;
+        int dist = 1;
+        int ans = 0;
+        while(!que.empty()){
+            int sz = que.size();
+            for(int i = 0; i < sz; i++){
+                int curr = que.front(); que.pop();
+                for(auto &v : adj[curr]){
+                    if(visited[v]) continue;
+                    que.push(v);
+                    visited[v] = true;
+                    ans = max(ans, patience[v] * ((2 * dist - 1) / patience[v]) + 2 * dist + 1);
+                }
+            }
+            dist++;
+        }
+        return ans;
+    }
+};  
+
+class solution_2608{
+public:
+    int findShortestCycle(int n, vector<vector<int>>& edges){
+        vector<vector<int>> g(n, vector<int>());
+        for(auto &e : edges){
+            g[e[0]].push_back(e[1]);
+            g[e[1]].push_back(e[0]);
+        }
+        vector<int> dis(n, -1);  
+        auto bfs = [&](int start) -> int{
+            fill(dis.begin(), dis.end(), -1);    
+            int ans = INT_MAX;
+            dis[start] = 0;
+            queue<pair<int, int>> q;
+            q.emplace(pair<int, int>(start, -1));
+            while(!q.empty()){
+                pair<int, int> cur = q.front(); q.pop();
+                for(int v : g[cur.first]){
+                    if(dis[v] < 0){
+                        dis[v] = dis[cur.first] + 1;
+                        q.emplace(v, cur.first);
+                    }
+                    else if(v != cur.second){
+                        ans = min(ans, dis[cur.first] + dis[v] + 1);
+                    }
+                }
+            }
+            return ans;
+        };
+        
+        int ans = INT_MAX;
+        for(int i = 0; i < n; i++){
+            ans = min(ans, bfs(i));
+        }
+        return ans == INT_MAX? -1 : ans;
+    }
 };
 
 int main(){
-    solution_1298 s;
-    vector<int> status = {1, 0, 1, 0};
-    vector<int> candies = {7,5,4,100};
-    vector<vector<int>> keys = {{},{},{1},{}};
-    vector<vector<int>> containedBoxes = {{1,2},{3},{},{}};
-    vector<int> initialBoxes = {0};
-    cout << s.maxCandies(status, candies, keys, containedBoxes, initialBoxes);
+    int x, y;
+    char s;
+    while(cin >> x >> s >> y){
+        cout << x << ' ' << y << ' ' << s << endl;
+    }
 }
