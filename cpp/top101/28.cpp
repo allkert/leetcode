@@ -1,27 +1,21 @@
 #include <iostream>
 using namespace std;
 
-int quickmulti(int a, int b, int p){
-    int res = 0;
-    int base = a;
-    while(b > 0){
-        if(b % 2 == 1){
-            res += base;
-        }
-        base *= 2;
-        base %= p;
-        b /= 2;
-    }
-    return res % p;
-}
-
 int main() {
-    int n;
-    cin >> n;
-    for(int i = 0; i < n; i++){
+    int q;
+    cin >> q;
+    while(q--){
         int a, b, p;
         cin >> a >> b >> p;
-        cout << quickmulti(a, b, p) << endl;
+        long long  base = a;
+        long long res = 1;
+        while(b > 0){
+            if(b % 2) res = (res * base) % p;
+            base *= base;
+            base %= p;
+            b /= 2;
+        }
+        cout << res << endl;
     }
 }
 // 64 位输出请用 printf("%lld")

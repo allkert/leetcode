@@ -1,16 +1,18 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
+#include<queue>
 
 using namespace std;
 
 int main(){
-    vector<int> a = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-    vector<int> b = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    sort(b.begin(), b.end(), [&](int x, int y) {
-        return a[x] < a[y];
+    // auto cmp = [&](const int a, const int b){
+    //     return a > b;
+    // };
+    // priority_queue<int, vector<int>, decltype(cmp)> q(cmp);
+    vector<int> v = {1, 2, 3, 4, 5};
+    sort(v.begin(), v.end(), [](const int a, const int b){
+        return a > b;
     });
-    for (int i = 0; i < 10; i++) {
-        cout << b[i] << " ";
-    }
+    cout << __cplusplus << endl;
 }
