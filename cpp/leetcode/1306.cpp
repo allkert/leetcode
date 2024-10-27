@@ -7,46 +7,35 @@ using namespace std;
 
 class Solution {
 public:
-    bool canReach(vector<int>& arr, int start) {
+    int minJumps(vector<int>& arr) {
         int n = arr.size();
-        vector<bool> vis(n, false);
-        function<void(int)> dfs = [&](int x){
-            if(vis[x]) return;
-            vis[x] = true;
-            if(x - arr[x] >= 0) dfs(x - arr[x]);
-            if(x + arr[x] < n) dfs(x + arr[x]); 
-        };
-        dfs(start);
-        for(int i = 0; i < n; ++i){
-            if(!arr[i] && vis[i]) return true;
+        unordered_map<int, vector<int>> mp;
+        for(int i = 0; i < n; i++) mp[arr[i]].push_back(i);
+        vector<int> dis(n, -1);
+        dis[0] = 0;
+        queue<int> q;
+        q.emplace(0);
+        while(!q.empty()){
+            auto cur = q.front(); q.pop();
+            if(cur == n - 1) return dis[n-1];
+            if(mp.find(arr[cur]) != mp.end()){
+                for(auto nxt : mp[arr[cur]]){
+                    if(nxt != cur && dis[nxt] == -1){
+                        dis[nxt] = dis[cur] + 1;
+                        q.emplace(nxt);
+                    }
+                }
+                mp.erase(arr[cur]);
+            }
+            if(cur && dis[cur - 1] == -1){
+                dis[cur - 1] = dis[cur] + 1;
+                q.emplace(cur - 1);
+            }
+            if(cur < n - 1 && dis[cur + 1] == -1){
+                dis[cur + 1] = dis[cur] + 1;
+                q.emplace(cur + 1);
+            }
         }
-        return false;
+        return dis[n-1];
     }
 };
-
-int main(){
-    map<int, vector<int>> mp = {
-        {0, {4,2,3,0,3,1,2}},
-        {5, {4,2,3,0,3,1,2}},
-        {0, {3,0,2,1,2}},
-        {2, {3,0,2,1,2}},
-        {3, {3,0,2,1,2}},
-        {0, {0}},
-        {1, {0}},
-        {0, {1}},
-        {0, {3,0,2,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-        {0, {4,2,3,0,3,1,2}},
-    };
-    for(auto it : mp){
-        cout << it.first << " "  << endl;
-    }
-}
